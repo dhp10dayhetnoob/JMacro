@@ -257,9 +257,11 @@ public class GUI implements NativeKeyListener {
                 	}
                 	
                     Recorder.RECORD_HOTKEY = selectedKey; // Update the record hotkey
-                    labelRecording.setText(String.format(TOPBAR_FORMAT, "Record", KeyEvent.getKeyText(selectedKey))); // Update the label to show the new hotkey
+                    labelRecording.setText(String.format(TOPBAR_FORMAT, "Record", KeyEvent.getKeyText(e.getKeyCode()))); // Update the label to show the new hotkey
                     labelRecording.revalidate();
                     labelRecording.repaint();
+                    labelRecording.getParent().revalidate();
+                    labelRecording.getParent().repaint();
                 } else {
                 	if (selectedKey == Recorder.RECORD_HOTKEY) {
                 		JOptionPane.showMessageDialog(null, "Keybind already used!");
@@ -267,9 +269,11 @@ public class GUI implements NativeKeyListener {
                 	}
                 	
                     Recorder.PLAYBACK_HOTKEY = selectedKey; // Update the playback hotkey
-                    labelPlayback.setText(String.format(TOPBAR_FORMAT, "Play/Stop", KeyEvent.getKeyText(selectedKey))); // Update the label to show the new hotkey
+                    labelPlayback.setText(String.format(TOPBAR_FORMAT, "Play/Stop", KeyEvent.getKeyText(e.getKeyCode()))); // Update the label to show the new hotkey
                     labelPlayback.revalidate();
                     labelPlayback.repaint();
+                    labelPlayback.getParent().revalidate();
+                    labelPlayback.getParent().repaint();
                 }
                 keybindDialog.dispose(); // Close the dialog after key is selected
                 
