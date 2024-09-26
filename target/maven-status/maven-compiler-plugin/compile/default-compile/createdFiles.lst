@@ -1,4 +1,7 @@
+main\GUI$1.class
+main\Recorder.class
+main\EventListener.class
+main\GUI.class
 input\Mouse.class
 input\InputObject.class
-main\Recorder.class
 input\Keyboard.class

@@ -5,49 +5,64 @@ import java.util.ArrayList;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 
-public class Keyboard implements NativeKeyListener {
-	private ArrayList<InputObject> recording;
+import main.EventListener;
+import main.Recorder;
+
+public class Keyboard implements NativeKeyListener, EventListener {
+	private ArrayList<InputObject> loggedRecording;
 	private boolean enabled;
+	private double recordingStartTime; //use this instead of using RecordingList !!!
 	
-	public Keyboard(ArrayList<InputObject> recording) {
-		this.recording = recording;
-		this.enabled = true;
+	public Keyboard(ArrayList<InputObject> loggedRecording) {
+		this.loggedRecording = loggedRecording;
+		this.enabled = false;
 	}
 	
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
+	public void overWriteRecording(ArrayList<InputObject> loggedRecording) {
+		this.loggedRecording = loggedRecording;
 	}
 		 
 	@Override
 	public void nativeKeyPressed(NativeKeyEvent e) {
-		if (!enabled) {
+		int keyCode = e.getKeyCode();
+		if (!enabled || keyCode == Recorder.PLAYBACK_HOTKEY || keyCode == Recorder.RECORD_HOTKEY) {
 			return;
 		}
 		
-		this.recording.add(new InputObject(
-			System.nanoTime(),
+		double elapsedTime = (System.nanoTime() - recordingStartTime) / 1_000_000_000d;
+    	this.loggedRecording.add(new InputObject(
+    		elapsedTime,
 			(byte) 1,
-			(byte) e.getKeyCode(),
+			(byte) keyCode,
 			true
 		));
-		
-		System.out.println("Key Pressed: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
 	}
 	
 	// Handle key release events
 	@Override
 	public void nativeKeyReleased(NativeKeyEvent e) {
-		if (!enabled) {
+		int keyCode = e.getKeyCode();
+		if (!enabled || keyCode == Recorder.PLAYBACK_HOTKEY || keyCode == Recorder.RECORD_HOTKEY) {
 			return;
 		}
 		
-		this.recording.add(new InputObject(
-			System.nanoTime(),
+		double elapsedTime = (System.nanoTime() - recordingStartTime) / 1_000_000_000d;
+    	this.loggedRecording.add(new InputObject(
+    		elapsedTime,
 			(byte) 1,
-			(byte) e.getKeyCode(),
+			(byte) keyCode,
 			false
 		));
-		
-		System.out.println("Key Released: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
 	}
+	
+	@Override
+	public void onEventTriggered(int type, boolean enabled) {
+		if (type == 1) {
+			this.enabled = enabled;
+			
+			if (enabled == true) {
+				this.recordingStartTime = System.nanoTime();
+			}
+		}
+	} 
 }

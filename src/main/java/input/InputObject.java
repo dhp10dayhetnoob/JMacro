@@ -2,7 +2,7 @@ package input;
 
 public class InputObject {
 	private double timeStamp;
-	private byte inputType; //1 = keyboard, 2 = mouse input, 3 = mouse move
+	private byte inputType; //1 = keyboard, 2 = mouse input, 3 = mouse move, 4 delay
 	
 	//1 byte for key/button input, a boolean for up/down state
     private byte keyOrButton;
@@ -18,6 +18,7 @@ public class InputObject {
     	this.inputType = inputType;
     	this.keyOrButton = keyOrButton;
     	this.upOrDown = upOrDown;
+    	System.out.println("registered input at " + timeStamp);
     }
     
     //object in case of mouse movement
@@ -26,6 +27,13 @@ public class InputObject {
     	this.inputType = inputType;
     	this.mouseX = mouseX;
     	this.mouseY = mouseY;
+    	System.out.println("registered mouse movement at " + timeStamp);
+    }
+    
+    public InputObject(double timeStamp, byte inputType) {
+    	this.timeStamp = timeStamp;
+    	this.inputType = inputType;
+    	System.out.println("registered delay at " + timeStamp);
     }
     
     //getters
