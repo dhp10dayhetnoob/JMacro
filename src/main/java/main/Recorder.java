@@ -1,15 +1,10 @@
 package main;
 
-import java.awt.AWTException;
-import java.awt.Robot;
-import java.awt.event.KeyEvent;
-
 import input.InputObject;
 import input.Keyboard;
 import input.Mouse;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -22,8 +17,8 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 public class Recorder implements EventListener {
 	private static final double EPSILON = 0.005;
 	private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-	public static final byte RECORD_HOTKEY = NativeKeyEvent.VC_F1;
-	public static final byte PLAYBACK_HOTKEY = NativeKeyEvent.VC_F2;
+	public static int RECORD_HOTKEY = NativeKeyEvent.VC_F1;
+	public static int PLAYBACK_HOTKEY = NativeKeyEvent.VC_F2;
 	private static final int TARGET_DELAY = 16; //target delay in milliseconds, runs at ca. 62.5 fps
 	
 	private double recordingStartTime;
@@ -73,7 +68,7 @@ public class Recorder implements EventListener {
 		GlobalScreen.addNativeMouseMotionListener(this.mouseListener);
 	}
 	
-	public void run() {
+	private void run() {
 		previousTime = System.nanoTime();
 	
 		//main input processing logic for playback

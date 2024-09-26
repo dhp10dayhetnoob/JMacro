@@ -1,8 +1,6 @@
 package main;
 
 import java.awt.Robot;
-import java.awt.event.KeyEvent;
-
 import input.InputObject;
 
 public class InputSimulator {

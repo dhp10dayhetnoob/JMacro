@@ -7,7 +7,6 @@ import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseMotionListener;
 
 import main.EventListener;
-import main.MouseEventConverter;
 
 public class Mouse implements NativeMouseListener, NativeMouseMotionListener, EventListener  {
 	private final double MOUSE_MOVE_THROTTLE = .033; //max 30 mouse moves a second

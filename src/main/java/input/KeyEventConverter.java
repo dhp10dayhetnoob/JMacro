@@ -1,11 +1,12 @@
-package main;
+package input;
 
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
-import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 
 public class KeyEventConverter {
 
@@ -99,5 +100,14 @@ public class KeyEventConverter {
      */
     public static int convertNativeToKeyEvent(int nativeKeyCode) {
         return keyMap.getOrDefault(nativeKeyCode, -1); // Return -1 if not found
+    }
+    
+    public static Integer getNativeByKeyEvent(Integer value) {
+        for (Entry<Integer, Integer> entry : keyMap.entrySet()) {
+            if (Objects.equals(value, entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return -1;
     }
 }

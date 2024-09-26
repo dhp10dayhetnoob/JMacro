@@ -1,12 +1,14 @@
 package main;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -24,6 +26,7 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 
 import input.InputObject;
+import input.KeyEventConverter;
 
 public class GUI implements NativeKeyListener {
 	private static final String TOPBAR_FORMAT = "<html>%s<br><h1 style=\"text-align:center\"><b>%s</b></h1></html>";
@@ -31,6 +34,7 @@ public class GUI implements NativeKeyListener {
 	private List<EventListener> listeners = new ArrayList<EventListener>();
 	private boolean recording;
 	private boolean playing;
+	private boolean interrupt;
 	
 	private JLabel labelRecording;
 	private JLabel labelPlayback;
@@ -40,6 +44,7 @@ public class GUI implements NativeKeyListener {
 	private Recorder parent;
 	
     public GUI(Recorder parent) {
+    	this.interrupt = false;
     	this.parent = parent;
         SwingUtilities.invokeLater(() -> {
             createAndShowGUI();
@@ -54,6 +59,9 @@ public class GUI implements NativeKeyListener {
     	} else {
     		labelRecording.setForeground(Color.WHITE);
     	}
+    	
+    	labelRecording.revalidate();
+    	labelRecording.repaint();
 
     	for (EventListener listener : listeners) {
             listener.onEventTriggered(1, recording);
@@ -68,6 +76,9 @@ public class GUI implements NativeKeyListener {
     	} else {
     		labelPlayback.setForeground(Color.WHITE);
     	}
+
+    	labelPlayback.revalidate();
+    	labelPlayback.repaint();
     	
     	for (EventListener listener : listeners) {
             listener.onEventTriggered(2, playing);
@@ -99,16 +110,22 @@ public class GUI implements NativeKeyListener {
         labelRecording = new JLabel(String.format(TOPBAR_FORMAT, "Record", "F1"));
         labelPlayback = new JLabel(String.format(TOPBAR_FORMAT, "Play/Stop", "F2"));
         labelOptions = new JLabel("Options"); // Change label to reflect that it's clickable
+        JLabel btnExport = new JLabel("Export");
+        JLabel btnImport = new JLabel("Import");
         
         // Customize label appearance
         labelRecording.setForeground(Color.WHITE);
         labelPlayback.setForeground(Color.WHITE);
         labelOptions.setForeground(Color.WHITE);
+        btnExport.setForeground(Color.WHITE);
+        btnImport.setForeground(Color.WHITE);
 
         Font labelFont = new Font("Arial", Font.PLAIN, 18);
         labelRecording.setFont(labelFont);
         labelPlayback.setFont(labelFont);
         labelOptions.setFont(labelFont);
+        btnExport.setFont(labelFont);
+        btnImport.setFont(labelFont);
 
         // Add elements to the panel with spacing
         topBarPanel.add(labelRecording);
@@ -120,18 +137,12 @@ public class GUI implements NativeKeyListener {
         topBarPanel.add(new JSeparator(SwingConstants.VERTICAL));
         topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
         topBarPanel.add(labelOptions);
-        
-        // Add the import/export buttons to the top bar
-        JButton btnExport = new JButton("Export");
-        JButton btnImport = new JButton("Import");
-
+        topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
+        topBarPanel.add(new JSeparator(SwingConstants.VERTICAL));
         topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
         topBarPanel.add(btnExport);
         topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
-        topBarPanel.add(btnImport);
-        
-        topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
-        topBarPanel.add(btnExport);
+        topBarPanel.add(new JSeparator(SwingConstants.VERTICAL));
         topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
         topBarPanel.add(btnImport);
 
@@ -146,17 +157,18 @@ public class GUI implements NativeKeyListener {
         frame.setLocation(xPos, 0); // Stick to the top of the screen
         
         // Add action listeners for Import/Export
-        btnExport.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                exportClubs();
+        btnExport.addMouseListener(new MouseAdapter() {
+        	@Override
+            public void mouseClicked(MouseEvent e) {
+        		exportRecording();
             }
         });
 
-        btnImport.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                importClubs();
+     // Add action listeners for Import/Export
+        btnImport.addMouseListener(new MouseAdapter() {
+        	@Override
+            public void mouseClicked(MouseEvent e) {
+        		 importRecording();
             }
         });
 
@@ -170,21 +182,42 @@ public class GUI implements NativeKeyListener {
         // Create the popup menu
         JPopupMenu optionsMenu = new JPopupMenu();
 
-        // Create a checkbox menu item
-        checkBoxMenuItem = new JCheckBoxMenuItem("Continous Playback");
+        // Create a checkbox menu item for continuous playback
+        checkBoxMenuItem = new JCheckBoxMenuItem("Continuous Playback");
         checkBoxMenuItem.setSelected(false); // Default state
         checkBoxMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Handle checkbox state change
                 boolean isSelected = checkBoxMenuItem.isSelected();
                 parent.setContinousPlayback(isSelected);
-                // You can notify listeners or handle the state change here
             }
         });
 
         // Add the checkbox item to the popup menu
         optionsMenu.add(checkBoxMenuItem);
+
+        // Add menu items for setting keybinds
+        JMenuItem setRecordHotkey = new JMenuItem("Set Record Hotkey");
+        JMenuItem setPlaybackHotkey = new JMenuItem("Set Playback Hotkey");
+
+        // Add action listeners for each hotkey setting
+        setRecordHotkey.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectNewHotkey(true);  // true for Record Hotkey
+            }
+        });
+
+        setPlaybackHotkey.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectNewHotkey(false); // false for Playback Hotkey
+            }
+        });
+
+        // Add the keybind options to the popup menu
+        optionsMenu.add(setRecordHotkey);
+        optionsMenu.add(setPlaybackHotkey);
 
         // Add a mouse listener to the "Options" label to show the popup menu when clicked
         labelOptions.addMouseListener(new MouseAdapter() {
@@ -195,9 +228,61 @@ public class GUI implements NativeKeyListener {
             }
         });
     }
+
+    private void selectNewHotkey(boolean isRecordHotkey) {
+    	interrupt = true;
+    	
+        JDialog keybindDialog = new JDialog((JFrame) null, "Press a Key", true);
+        JLabel instructionLabel = new JLabel("Press a key to set as " + (isRecordHotkey ? "Record" : "Playback") + " hotkey");
+        instructionLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        keybindDialog.setSize(300, 100);
+        keybindDialog.setLayout(new BorderLayout());
+        keybindDialog.add(instructionLabel, BorderLayout.CENTER);
+
+        // Add a key listener to capture the next key press
+        keybindDialog.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                int selectedKey = KeyEventConverter.getNativeByKeyEvent(e.getKeyCode());
+                if (selectedKey == -1) {
+                	JOptionPane.showMessageDialog(null, "Invalid Input!");
+                	return;
+                }
+                
+                if (isRecordHotkey) {
+                	if (selectedKey == Recorder.PLAYBACK_HOTKEY) {
+                		JOptionPane.showMessageDialog(null, "Keybind already used!");
+                		return;
+                	}
+                	
+                    Recorder.RECORD_HOTKEY = selectedKey; // Update the record hotkey
+                    labelRecording.setText(String.format(TOPBAR_FORMAT, "Record", KeyEvent.getKeyText(selectedKey))); // Update the label to show the new hotkey
+                    labelRecording.revalidate();
+                    labelRecording.repaint();
+                } else {
+                	if (selectedKey == Recorder.RECORD_HOTKEY) {
+                		JOptionPane.showMessageDialog(null, "Keybind already used!");
+                		return;
+                	}
+                	
+                    Recorder.PLAYBACK_HOTKEY = selectedKey; // Update the playback hotkey
+                    labelPlayback.setText(String.format(TOPBAR_FORMAT, "Play/Stop", KeyEvent.getKeyText(selectedKey))); // Update the label to show the new hotkey
+                    labelPlayback.revalidate();
+                    labelPlayback.repaint();
+                }
+                keybindDialog.dispose(); // Close the dialog after key is selected
+                
+                interrupt = false;
+            }
+        });
+
+        keybindDialog.setFocusable(true);
+        keybindDialog.setLocationRelativeTo(null); // Center the dialog on screen
+        keybindDialog.setVisible(true); // Show the dialog and wait for input
+    }
     
-    // Method to export the list of clubs
-    private void exportClubs() {
+    private void exportRecording() {
         JFileChooser fileChooser = new JFileChooser();
         int option = fileChooser.showSaveDialog(null);
 
@@ -214,8 +299,8 @@ public class GUI implements NativeKeyListener {
         }
     }
 
-    // Method to import the list of clubs
-    private void importClubs() {
+    @SuppressWarnings("unchecked")
+	private void importRecording() {
         JFileChooser fileChooser = new JFileChooser();
         int option = fileChooser.showOpenDialog(null);
 
@@ -234,6 +319,11 @@ public class GUI implements NativeKeyListener {
     
     @Override
     public void nativeKeyReleased(NativeKeyEvent e) {
+    	System.out.println(interrupt);
+    	if (interrupt == true) {
+    		return;
+    	}
+    	
     	if (e.getKeyCode() == Recorder.RECORD_HOTKEY) {
     		setRecording(!recording);
     	} else if (e.getKeyCode() == Recorder.PLAYBACK_HOTKEY) {

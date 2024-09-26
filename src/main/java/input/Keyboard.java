@@ -6,7 +6,6 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 
 import main.EventListener;
-import main.KeyEventConverter;
 import main.Recorder;
 
 public class Keyboard implements NativeKeyListener, EventListener {
