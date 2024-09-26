@@ -52,7 +52,7 @@ public class GUI implements NativeKeyListener {
         });
     }
     
-    public void setRecording(boolean enabled) {
+    public void setRecording(boolean enabled, boolean authorative) {
     	recording = enabled;
     	
     	if (enabled) {
@@ -60,16 +60,13 @@ public class GUI implements NativeKeyListener {
     	} else {
     		labelRecording.setForeground(Color.WHITE);
     	}
-    	
-    	labelRecording.revalidate();
-    	labelRecording.repaint();
 
     	for (EventListener listener : listeners) {
-            listener.onEventTriggered(1, recording);
+            listener.onEventTriggered(1, recording, authorative);
         }
     }
     
-    public void setPlaying(boolean enabled) {
+    public void setPlaying(boolean enabled, boolean authorative) {
     	playing = enabled;
     	
     	if (enabled) {
@@ -77,17 +74,18 @@ public class GUI implements NativeKeyListener {
     	} else {
     		labelPlayback.setForeground(Color.WHITE);
     	}
-
-    	labelPlayback.revalidate();
-    	labelPlayback.repaint();
     	
     	for (EventListener listener : listeners) {
-            listener.onEventTriggered(2, playing);
+            listener.onEventTriggered(2, playing, authorative);
         }
     }
     
     public boolean isRecording() {
     	return recording;
+    }
+    
+    public boolean isPlaying() {
+    	return playing;
     }
     
     public void addListener(EventListener listener) {
@@ -340,9 +338,9 @@ public class GUI implements NativeKeyListener {
     	}
     	
     	if (e.getKeyCode() == Recorder.RECORD_HOTKEY) {
-    		setRecording(!recording);
+    		setRecording(!recording, false);
     	} else if (e.getKeyCode() == Recorder.PLAYBACK_HOTKEY) {
-    		setPlaying(!playing);
+    		setPlaying(!playing, false);
     	}
     }
 }

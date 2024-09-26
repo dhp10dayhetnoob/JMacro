@@ -80,7 +80,7 @@ public class Mouse implements NativeMouseListener, NativeMouseMotionListener, Ev
     }
     
     @Override
-	public void onEventTriggered(int type, boolean enabled) {
+	public void onEventTriggered(int type, boolean enabled, boolean authorative) {
 		if (type == 1) {
 			this.enabled = enabled;
 			

@@ -56,7 +56,7 @@ public class Keyboard implements NativeKeyListener, EventListener {
 	}
 	
 	@Override
-	public void onEventTriggered(int type, boolean enabled) {
+	public void onEventTriggered(int type, boolean enabled, boolean authorative) {
 		if (type == 1) {
 			this.enabled = enabled;
 			

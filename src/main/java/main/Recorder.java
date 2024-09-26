@@ -100,7 +100,7 @@ public class Recorder implements EventListener {
 					runTime = runTime - loggedRecording.get(loggedRecording.size() - 1).getTimeStamp();
 					iterator = 0;
 				} else {
-					gui.setPlaying(false);
+					gui.setPlaying(false, true);
 					break;
 				}
 			}
@@ -110,8 +110,15 @@ public class Recorder implements EventListener {
 	}
 	
 	@Override //type 1 = recording, type 2 = playback
-	public void onEventTriggered(int type, boolean enabled) {
+	public void onEventTriggered(int type, boolean enabled, boolean authorative) {
 		if (type == 1) {
+			if (gui.isPlaying()) {
+				if (!authorative) {
+					this.gui.setRecording(false, true);
+				}
+				return;
+			}
+			
 			if (enabled == true) {
 				this.loggedRecording = new ArrayList<InputObject>();
 				this.keyboardListener.overWriteRecording(loggedRecording);
@@ -133,13 +140,17 @@ public class Recorder implements EventListener {
 		} else {
 			if (enabled == true) {
 				if (this.gui.isRecording()) {
-					this.gui.setRecording(false);
+					if (!authorative) {
+						this.gui.setRecording(false, true);
+					}
 					System.out.println("cancelled recording");
 				}
 				
 				System.out.println("playback started");
 				if (this.loggedRecording.isEmpty()) {
-					this.gui.setPlaying(false);
+					if (!authorative) {
+						this.gui.setPlaying(false, true);
+					}
 					System.out.println("playback stopped (empty recording)");
 					return;
 				}
