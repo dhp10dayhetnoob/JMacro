@@ -323,7 +323,6 @@ public class GUI implements NativeKeyListener {
     
     @Override
     public void nativeKeyReleased(NativeKeyEvent e) {
-    	System.out.println(interrupt);
     	if (interrupt == true) {
     		return;
     	}
