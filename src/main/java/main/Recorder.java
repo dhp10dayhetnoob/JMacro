@@ -66,6 +66,17 @@ public class Recorder implements EventListener {
 		GlobalScreen.addNativeKeyListener(this.gui);
 		GlobalScreen.addNativeMouseListener(this.mouseListener);
 		GlobalScreen.addNativeMouseMotionListener(this.mouseListener);
+		
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+		    public void run() {
+		    	try {
+					GlobalScreen.unregisterNativeHook();
+				} catch (NativeHookException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		    }
+		});
 	}
 	
 	private void run() {
