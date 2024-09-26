@@ -40,6 +40,7 @@ public class GUI implements NativeKeyListener {
 	private JLabel labelPlayback;
 	private JLabel labelOptions;
 	private JCheckBoxMenuItem checkBoxMenuItem;
+	private JFrame frame;
 	
 	private Recorder parent;
 	
@@ -95,7 +96,7 @@ public class GUI implements NativeKeyListener {
 
     private void createAndShowGUI() {
         // Create the JFrame (window) without borders
-        JFrame frame = new JFrame("Top Bar");
+        frame = new JFrame("Top Bar");
         frame.setUndecorated(true); // Removes window borders
         frame.setAlwaysOnTop(true); // Keep it always on top of other windows
         frame.setResizable(false); // Not resizable
@@ -192,9 +193,20 @@ public class GUI implements NativeKeyListener {
                 parent.setContinousPlayback(isSelected);
             }
         });
+        
+        JCheckBoxMenuItem alwaysOnTop = new JCheckBoxMenuItem("Always on Top");
+        alwaysOnTop.setSelected(true); // Default state
+        alwaysOnTop.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean isSelected = alwaysOnTop.isSelected();
+                frame.setAlwaysOnTop(isSelected);
+            }
+        });
 
         // Add the checkbox item to the popup menu
         optionsMenu.add(checkBoxMenuItem);
+        optionsMenu.add(alwaysOnTop);
 
         // Add menu items for setting keybinds
         JMenuItem setRecordHotkey = new JMenuItem("Set Record Hotkey");
