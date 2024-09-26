@@ -11,6 +11,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -98,6 +100,12 @@ public class GUI implements NativeKeyListener {
         frame.setUndecorated(true); // Removes window borders
         frame.setAlwaysOnTop(true); // Keep it always on top of other windows
         frame.setResizable(false); // Not resizable
+        
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent ev) {
+            	System.exit(0);
+            }
+        });
 
         // Create the top bar panel with horizontal layout
         JPanel topBarPanel = new JPanel();
