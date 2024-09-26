@@ -1,7 +1,11 @@
 main\GUI$1.class
+main\GUI$4.class
+main\GUI$2.class
 main\Recorder.class
 main\EventListener.class
 main\GUI.class
 input\Mouse.class
+main\GUI$3.class
+main\InputSimulator.class
 input\InputObject.class
 input\Keyboard.class

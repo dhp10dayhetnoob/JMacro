@@ -30,7 +30,7 @@ public class Recorder implements EventListener {
 	private double previousTime;
 	private double runTime;
 	
-	private ArrayList<InputObject> loggedRecording;
+	protected ArrayList<InputObject> loggedRecording;
 	private int iterator;
 	
 	private Mouse mouseListener;

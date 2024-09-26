@@ -1,6 +1,12 @@
 package input;
 
-public class InputObject {
+import java.io.Serializable;
+
+public class InputObject implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private double timeStamp;
 	private byte inputType; //1 = keyboard, 2 = mouse input, 3 = mouse move, 4 delay
 	

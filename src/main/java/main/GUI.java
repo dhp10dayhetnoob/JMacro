@@ -9,6 +9,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +22,8 @@ import javax.swing.*;
 
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
+
+import input.InputObject;
 
 public class GUI implements NativeKeyListener {
 	private static final String TOPBAR_FORMAT = "<html>%s<br><h1 style=\"text-align:center\"><b>%s</b></h1></html>";
@@ -112,6 +120,20 @@ public class GUI implements NativeKeyListener {
         topBarPanel.add(new JSeparator(SwingConstants.VERTICAL));
         topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
         topBarPanel.add(labelOptions);
+        
+        // Add the import/export buttons to the top bar
+        JButton btnExport = new JButton("Export");
+        JButton btnImport = new JButton("Import");
+
+        topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
+        topBarPanel.add(btnExport);
+        topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
+        topBarPanel.add(btnImport);
+        
+        topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
+        topBarPanel.add(btnExport);
+        topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
+        topBarPanel.add(btnImport);
 
         // Add the top bar to the frame
         frame.getContentPane().add(topBarPanel);
@@ -122,6 +144,21 @@ public class GUI implements NativeKeyListener {
         int frameWidth = frame.getWidth();
         int xPos = (screenSize.width / 2) - (frameWidth / 2); // Center horizontally
         frame.setLocation(xPos, 0); // Stick to the top of the screen
+        
+        // Add action listeners for Import/Export
+        btnExport.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                exportClubs();
+            }
+        });
+
+        btnImport.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                importClubs();
+            }
+        });
 
         addOptionsMenu();
         
@@ -157,6 +194,42 @@ public class GUI implements NativeKeyListener {
                 optionsMenu.show(labelOptions, e.getX(), e.getY());
             }
         });
+    }
+    
+    // Method to export the list of clubs
+    private void exportClubs() {
+        JFileChooser fileChooser = new JFileChooser();
+        int option = fileChooser.showSaveDialog(null);
+
+        if (option == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            try (FileOutputStream fos = new FileOutputStream(file);
+                ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+                oos.writeObject(parent.loggedRecording);
+                JOptionPane.showMessageDialog(null, "Export Successful!");
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Export Failed!");
+            }
+        }
+    }
+
+    // Method to import the list of clubs
+    private void importClubs() {
+        JFileChooser fileChooser = new JFileChooser();
+        int option = fileChooser.showOpenDialog(null);
+
+        if (option == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            try (FileInputStream fis = new FileInputStream(file);
+                ObjectInputStream ois = new ObjectInputStream(fis)) {
+                parent.loggedRecording = (ArrayList<InputObject>) ois.readObject();
+                JOptionPane.showMessageDialog(null, "Import Successful!");
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Import Failed!");
+            }
+        }
     }
     
     @Override
