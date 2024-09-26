@@ -6,6 +6,7 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 
 import main.EventListener;
+import main.KeyEventConverter;
 import main.Recorder;
 
 public class Keyboard implements NativeKeyListener, EventListener {
@@ -33,7 +34,7 @@ public class Keyboard implements NativeKeyListener, EventListener {
     	this.loggedRecording.add(new InputObject(
     		elapsedTime,
 			(byte) 1,
-			(byte) keyCode,
+			KeyEventConverter.convertNativeToKeyEvent(keyCode),
 			true
 		));
 	}
@@ -50,7 +51,7 @@ public class Keyboard implements NativeKeyListener, EventListener {
     	this.loggedRecording.add(new InputObject(
     		elapsedTime,
 			(byte) 1,
-			(byte) keyCode,
+			KeyEventConverter.convertNativeToKeyEvent(keyCode),
 			false
 		));
 	}

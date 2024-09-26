@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.Robot;
+import java.awt.event.KeyEvent;
 
 import input.InputObject;
 
@@ -21,22 +22,26 @@ public class InputSimulator {
 			return;
 		}
 		
-		if (type == 3) {
-			ROBOT.mouseMove(input.getMouseX(), input.getMouseY());
-		} else if (type == 2) {
-			boolean isDown = input.getIsUpOrDown();
-			if (isDown) {
-				ROBOT.mousePress(input.getKeyOrButton());
-			} else {
-				ROBOT.mouseRelease(input.getKeyOrButton());
+		try {
+			if (type == 3) {
+				ROBOT.mouseMove(input.getMouseX(), input.getMouseY());
+			} else if (type == 2) {
+				boolean isDown = input.getIsUpOrDown();
+				if (isDown) {
+					ROBOT.mousePress(input.getKeyOrButton());
+				} else {
+					ROBOT.mouseRelease(input.getKeyOrButton());
+				}
+			} else if (type == 1) {
+				boolean isDown = input.getIsUpOrDown();
+				if (isDown) {
+					ROBOT.keyPress(input.getKeyOrButton());
+				} else {
+					ROBOT.keyRelease(input.getKeyOrButton());
+				}
 			}
-		} else if (type == 1) {
-			boolean isDown = input.getIsUpOrDown();
-			if (isDown) {
-				ROBOT.keyPress(input.getKeyOrButton());
-			} else {
-				ROBOT.keyRelease(input.getKeyOrButton());
-			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
 		}
 	}
 }

@@ -11,7 +11,7 @@ public class InputObject implements Serializable {
 	private byte inputType; //1 = keyboard, 2 = mouse input, 3 = mouse move, 4 delay
 	
 	//1 byte for key/button input, a boolean for up/down state
-    private byte keyOrButton;
+    private int keyOrButton;
     private boolean upOrDown;
 
     //coordinates for mouse movement
@@ -19,7 +19,7 @@ public class InputObject implements Serializable {
     private int mouseY;
     
     //object in case of key/button input
-    public InputObject(double timeStamp, byte inputType, byte keyOrButton, boolean upOrDown) {
+    public InputObject(double timeStamp, byte inputType, int keyOrButton, boolean upOrDown) {
     	this.timeStamp = timeStamp;
     	this.inputType = inputType;
     	this.keyOrButton = keyOrButton;
