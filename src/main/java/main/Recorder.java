@@ -45,8 +45,8 @@ public class Recorder implements EventListener {
 	};
 	
 	public Recorder() {
-		this.loggedRecording = new ArrayList<InputObject>();
-		this.continousPlayback = false;
+		loggedRecording = new ArrayList<InputObject>();
+		continousPlayback = false;
 		
 		try {
 			GlobalScreen.registerNativeHook();
@@ -54,19 +54,22 @@ public class Recorder implements EventListener {
 			e.printStackTrace();
 		}
 		
-		this.gui = new GUI(this);
-		this.mouseListener = new Mouse(this.loggedRecording);
-		this.keyboardListener = new Keyboard(this.loggedRecording);
+		//create listener objects
+		gui = new GUI(this);
+		mouseListener = new Mouse(loggedRecording);
+		keyboardListener = new Keyboard(loggedRecording);
 		
-		this.gui.addListener(this);
-		this.gui.addListener(this.keyboardListener);
-		this.gui.addListener(this.mouseListener);
+		//add listeners
+		gui.addListener(this);
+		gui.addListener(keyboardListener);
+		gui.addListener(mouseListener);
 		
-		GlobalScreen.addNativeKeyListener(this.keyboardListener);
-		GlobalScreen.addNativeKeyListener(this.gui);
-		GlobalScreen.addNativeMouseListener(this.mouseListener);
-		GlobalScreen.addNativeMouseMotionListener(this.mouseListener);
+		GlobalScreen.addNativeKeyListener(keyboardListener);
+		GlobalScreen.addNativeKeyListener(gui);
+		GlobalScreen.addNativeMouseListener(mouseListener);
+		GlobalScreen.addNativeMouseMotionListener(mouseListener);
 		
+		//unregister native hook on close
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 		    public void run() {
 		    	try {
@@ -98,9 +101,10 @@ public class Recorder implements EventListener {
 	    }, TARGET_DELAY, TARGET_DELAY, TimeUnit.MILLISECONDS);
 	}
 
-	//for continous loop, make the runTime equal to runTime - recordedTime after a cycle so it doesnt drift apart slowly
 	private void update(double deltaTime) {
+		//get current input at index iterator
 		InputObject currentInput = loggedRecording.get(iterator);
+		//subtract epsilon for broader processing window
 		while (currentInput.getTimeStamp() - EPSILON <= runTime) {
 			System.out.println("processed input at " + runTime + " index " + iterator + "/" + (loggedRecording.size() - 1));
 			InputSimulator.simulate(currentInput);
@@ -108,6 +112,7 @@ public class Recorder implements EventListener {
 			iterator++;
 			if (iterator > loggedRecording.size() - 1) {
 				if (continousPlayback == true) {
+					//account for the difference in the next playback
 					runTime = runTime - loggedRecording.get(loggedRecording.size() - 1).getTimeStamp();
 					iterator = 0;
 				} else {
@@ -125,15 +130,15 @@ public class Recorder implements EventListener {
 		if (type == 1) {
 			if (gui.isPlaying()) {
 				if (!authorative) {
-					this.gui.setRecording(false, true);
+					gui.setRecording(false, true);
 				}
 				return;
 			}
 			
 			if (enabled == true) {
-				this.loggedRecording = new ArrayList<InputObject>();
-				this.keyboardListener.overWriteRecording(loggedRecording);
-				this.mouseListener.overWriteRecording(loggedRecording);
+				loggedRecording = new ArrayList<InputObject>();
+				keyboardListener.overWriteRecording(loggedRecording);
+				mouseListener.overWriteRecording(loggedRecording);
 				recordingStartTime = System.nanoTime();
 				System.out.println("new recording list");
 			} else {
@@ -150,17 +155,17 @@ public class Recorder implements EventListener {
 			}
 		} else {
 			if (enabled == true) {
-				if (this.gui.isRecording()) {
+				if (gui.isRecording()) {
 					if (!authorative) {
-						this.gui.setRecording(false, true);
+						gui.setRecording(false, true);
 					}
 					System.out.println("cancelled recording");
 				}
 				
 				System.out.println("playback started");
-				if (this.loggedRecording.isEmpty()) {
+				if (loggedRecording.isEmpty()) {
 					if (!authorative) {
-						this.gui.setPlaying(false, true);
+						gui.setPlaying(false, true);
 					}
 					System.out.println("playback stopped (empty recording)");
 					return;

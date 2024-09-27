@@ -15,7 +15,7 @@ public class Keyboard implements NativeKeyListener, EventListener {
 	
 	public Keyboard(ArrayList<InputObject> loggedRecording) {
 		this.loggedRecording = loggedRecording;
-		this.enabled = false;
+		enabled = false;
 	}
 	
 	public void overWriteRecording(ArrayList<InputObject> loggedRecording) {
@@ -30,7 +30,7 @@ public class Keyboard implements NativeKeyListener, EventListener {
 		}
 		
 		double elapsedTime = (System.nanoTime() - recordingStartTime) / 1_000_000_000d;
-    	this.loggedRecording.add(new InputObject(elapsedTime, (byte) 1, KeyEventConverter.convertNativeToKeyEvent(keyCode), true));
+    	loggedRecording.add(new InputObject(elapsedTime, (byte) 1, KeyEventConverter.convertNativeToKeyEvent(keyCode), true));
 	}
 	
 	// Handle key release events
@@ -42,7 +42,7 @@ public class Keyboard implements NativeKeyListener, EventListener {
 		}
 		
 		double elapsedTime = (System.nanoTime() - recordingStartTime) / 1_000_000_000d;
-    	this.loggedRecording.add(new InputObject(elapsedTime, (byte) 1, KeyEventConverter.convertNativeToKeyEvent(keyCode), false));
+    	loggedRecording.add(new InputObject(elapsedTime, (byte) 1, KeyEventConverter.convertNativeToKeyEvent(keyCode), false));
 	}
 	
 	@Override
@@ -51,7 +51,7 @@ public class Keyboard implements NativeKeyListener, EventListener {
 			this.enabled = enabled;
 			
 			if (enabled == true) {
-				this.recordingStartTime = System.nanoTime();
+				recordingStartTime = System.nanoTime();
 			}
 		}
 	} 

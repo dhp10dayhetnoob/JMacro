@@ -18,7 +18,7 @@ public class Mouse implements NativeMouseListener, NativeMouseMotionListener, Ev
 	
 	public Mouse(ArrayList<InputObject> loggedRecording) {
 		this.loggedRecording = loggedRecording;
-		this.enabled = false;
+		enabled = false;
 		nextMouseMove = 0;
 	}
 	
@@ -35,8 +35,8 @@ public class Mouse implements NativeMouseListener, NativeMouseMotionListener, Ev
     	
     	int converted = MouseEventConverter.convertNativeToMouseEvent(e.getButton());
     	double elapsedTime = (System.nanoTime() - recordingStartTime) / 1_000_000_000d;
-    	this.loggedRecording.add(new InputObject(elapsedTime, (byte) 3, e.getX(), e.getY()));
-    	this.loggedRecording.add(new InputObject(elapsedTime, (byte) 2, converted, true));
+    	loggedRecording.add(new InputObject(elapsedTime, (byte) 3, e.getX(), e.getY()));
+    	loggedRecording.add(new InputObject(elapsedTime, (byte) 2, converted, true));
     }
 
     // Handle mouse button release events
@@ -48,8 +48,8 @@ public class Mouse implements NativeMouseListener, NativeMouseMotionListener, Ev
     	
     	int converted = MouseEventConverter.convertNativeToMouseEvent(e.getButton());
     	double elapsedTime = (System.nanoTime() - recordingStartTime) / 1_000_000_000d;
-    	this.loggedRecording.add(new InputObject(elapsedTime, (byte) 3, e.getX(), e.getY()));
-    	this.loggedRecording.add(new InputObject(elapsedTime, (byte) 2, converted, false));
+    	loggedRecording.add(new InputObject(elapsedTime, (byte) 3, e.getX(), e.getY()));
+    	loggedRecording.add(new InputObject(elapsedTime, (byte) 2, converted, false));
     }
     
     // Handle mouse movement events
@@ -62,7 +62,7 @@ public class Mouse implements NativeMouseListener, NativeMouseMotionListener, Ev
     	double currentTime = System.currentTimeMillis();
     	if ((currentTime + MOUSE_MOVE_THROTTLE) >= nextMouseMove) {
     		double elapsedTime = (System.nanoTime() - recordingStartTime) / 1_000_000_000d;
-        	this.loggedRecording.add(new InputObject(elapsedTime, (byte) 3, e.getX(), e.getY()));
+        	loggedRecording.add(new InputObject(elapsedTime, (byte) 3, e.getX(), e.getY()));
     		
     		nextMouseMove = currentTime + MOUSE_MOVE_THROTTLE * 1000;
     	}
@@ -71,10 +71,10 @@ public class Mouse implements NativeMouseListener, NativeMouseMotionListener, Ev
     @Override
 	public void onEventTriggered(int type, boolean enabled, boolean authorative) {
 		if (type == 1) {
-			this.enabled = enabled;
+			enabled = enabled;
 			
 			if (enabled == true) {
-				this.recordingStartTime = System.nanoTime();
+				recordingStartTime = System.nanoTime();
 			}
 		}
 	} 

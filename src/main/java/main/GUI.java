@@ -47,7 +47,7 @@ public class GUI implements NativeKeyListener {
 	private Recorder parent;
 	
     public GUI(Recorder parent) {
-    	this.interrupt = false;
+    	interrupt = false;
     	this.parent = parent;
         SwingUtilities.invokeLater(() -> {
             createAndShowGUI();
