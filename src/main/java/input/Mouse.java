@@ -33,13 +33,10 @@ public class Mouse implements NativeMouseListener, NativeMouseMotionListener, Ev
     		return;
     	}
     	
+    	int converted = MouseEventConverter.convertNativeToMouseEvent(e.getButton());
     	double elapsedTime = (System.nanoTime() - recordingStartTime) / 1_000_000_000d;
-    	this.loggedRecording.add(new InputObject(
-    		elapsedTime,
-    		(byte) 2,
-    		MouseEventConverter.convertNativeToMouseEvent(e.getButton()),
-    		true
-    	));
+    	this.loggedRecording.add(new InputObject(elapsedTime, (byte) 3, e.getX(), e.getY()));
+    	this.loggedRecording.add(new InputObject(elapsedTime, (byte) 2, converted, true));
     }
 
     // Handle mouse button release events
@@ -49,13 +46,10 @@ public class Mouse implements NativeMouseListener, NativeMouseMotionListener, Ev
 			return;
 		}
     	
+    	int converted = MouseEventConverter.convertNativeToMouseEvent(e.getButton());
     	double elapsedTime = (System.nanoTime() - recordingStartTime) / 1_000_000_000d;
-    	this.loggedRecording.add(new InputObject(
-    		elapsedTime,
-        	(byte) 2,
-        	MouseEventConverter.convertNativeToMouseEvent(e.getButton()),
-        	false
-        ));
+    	this.loggedRecording.add(new InputObject(elapsedTime, (byte) 3, e.getX(), e.getY()));
+    	this.loggedRecording.add(new InputObject(elapsedTime, (byte) 2, converted, false));
     }
     
     // Handle mouse movement events
@@ -68,12 +62,7 @@ public class Mouse implements NativeMouseListener, NativeMouseMotionListener, Ev
     	double currentTime = System.currentTimeMillis();
     	if ((currentTime + MOUSE_MOVE_THROTTLE) >= nextMouseMove) {
     		double elapsedTime = (System.nanoTime() - recordingStartTime) / 1_000_000_000d;
-        	this.loggedRecording.add(new InputObject(
-        		elapsedTime,
-    	        (byte) 3,
-    	        e.getX(),
-    	        e.getY()
-    		));
+        	this.loggedRecording.add(new InputObject(elapsedTime, (byte) 3, e.getX(), e.getY()));
     		
     		nextMouseMove = currentTime + MOUSE_MOVE_THROTTLE * 1000;
     	}

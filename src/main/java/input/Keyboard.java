@@ -30,12 +30,7 @@ public class Keyboard implements NativeKeyListener, EventListener {
 		}
 		
 		double elapsedTime = (System.nanoTime() - recordingStartTime) / 1_000_000_000d;
-    	this.loggedRecording.add(new InputObject(
-    		elapsedTime,
-			(byte) 1,
-			KeyEventConverter.convertNativeToKeyEvent(keyCode),
-			true
-		));
+    	this.loggedRecording.add(new InputObject(elapsedTime, (byte) 1, KeyEventConverter.convertNativeToKeyEvent(keyCode), true));
 	}
 	
 	// Handle key release events
@@ -47,12 +42,7 @@ public class Keyboard implements NativeKeyListener, EventListener {
 		}
 		
 		double elapsedTime = (System.nanoTime() - recordingStartTime) / 1_000_000_000d;
-    	this.loggedRecording.add(new InputObject(
-    		elapsedTime,
-			(byte) 1,
-			KeyEventConverter.convertNativeToKeyEvent(keyCode),
-			false
-		));
+    	this.loggedRecording.add(new InputObject(elapsedTime, (byte) 1, KeyEventConverter.convertNativeToKeyEvent(keyCode), false));
 	}
 	
 	@Override
