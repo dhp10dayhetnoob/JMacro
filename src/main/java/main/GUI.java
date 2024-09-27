@@ -293,9 +293,9 @@ public class GUI implements NativeKeyListener {
                     labelPlayback.getParent().revalidate();
                     labelPlayback.getParent().repaint();
                 }
-                keybindDialog.dispose(); // Close the dialog after key is selected
                 
                 interrupt = false;
+                keybindDialog.dispose(); // Close the dialog after key is selected
             }
         });
 

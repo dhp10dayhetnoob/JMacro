@@ -71,7 +71,7 @@ public class Mouse implements NativeMouseListener, NativeMouseMotionListener, Ev
     @Override
 	public void onEventTriggered(int type, boolean enabled, boolean authorative) {
 		if (type == 1) {
-			enabled = enabled;
+			this.enabled = enabled;
 			
 			if (enabled == true) {
 				recordingStartTime = System.nanoTime();
