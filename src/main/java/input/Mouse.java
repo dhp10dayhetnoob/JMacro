@@ -9,7 +9,8 @@ import com.github.kwhat.jnativehook.mouse.NativeMouseMotionListener;
 import main.EventListener;
 
 public class Mouse implements NativeMouseListener, NativeMouseMotionListener, EventListener  {
-	private final double MOUSE_MOVE_THROTTLE = .033; //max 30 mouse moves a second
+	private static final double MOUSE_MOVE_THROTTLE = .033; //max 30 mouse moves a second
+	private static final double MOUSE_MOVE_TIMESHIFT = 0.001;
 	private double nextMouseMove;
 	private double recordingStartTime; //use this instead of using RecordingList !!!
 	
@@ -35,7 +36,7 @@ public class Mouse implements NativeMouseListener, NativeMouseMotionListener, Ev
     	
     	int converted = MouseEventConverter.convertNativeToMouseEvent(e.getButton());
     	double elapsedTime = (System.nanoTime() - recordingStartTime) / 1_000_000_000d;
-    	loggedRecording.add(new InputObject(elapsedTime, (byte) 3, e.getX(), e.getY()));
+    	loggedRecording.add(new InputObject(elapsedTime - MOUSE_MOVE_TIMESHIFT, (byte) 3, e.getX(), e.getY()));
     	loggedRecording.add(new InputObject(elapsedTime, (byte) 2, converted, true));
     }
 
@@ -48,7 +49,7 @@ public class Mouse implements NativeMouseListener, NativeMouseMotionListener, Ev
     	
     	int converted = MouseEventConverter.convertNativeToMouseEvent(e.getButton());
     	double elapsedTime = (System.nanoTime() - recordingStartTime) / 1_000_000_000d;
-    	loggedRecording.add(new InputObject(elapsedTime, (byte) 3, e.getX(), e.getY()));
+    	loggedRecording.add(new InputObject(elapsedTime - MOUSE_MOVE_TIMESHIFT, (byte) 3, e.getX(), e.getY()));
     	loggedRecording.add(new InputObject(elapsedTime, (byte) 2, converted, false));
     }
     

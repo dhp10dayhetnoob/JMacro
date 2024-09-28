@@ -1,6 +1,7 @@
 package main;
 
 import input.InputObject;
+import gui.MainFrame;
 import input.Keyboard;
 import input.Mouse;
 
@@ -25,12 +26,12 @@ public class Recorder implements EventListener {
 	private double previousTime;
 	private double runTime;
 	
-	protected ArrayList<InputObject> loggedRecording;
+	private ArrayList<InputObject> loggedRecording;
 	private int iterator;
 	
 	private Mouse mouseListener;
 	private Keyboard keyboardListener;
-	private GUI gui;
+	private MainFrame gui;
 	
 	private ScheduledFuture<?> scheduledFuture;
 	
@@ -38,6 +39,14 @@ public class Recorder implements EventListener {
 	
 	public static void main(String[] args) {
 		new Recorder();
+	}
+	
+	public ArrayList<InputObject> getRecording() {
+		return loggedRecording;
+	}
+	
+	public void setRecording(ArrayList<InputObject> recording) {
+		this.loggedRecording = recording;
 	}
 	
 	public void setContinousPlayback(boolean enabled) {
@@ -55,7 +64,7 @@ public class Recorder implements EventListener {
 		}
 		
 		//create listener objects
-		gui = new GUI(this);
+		gui = new MainFrame(this);
 		mouseListener = new Mouse(loggedRecording);
 		keyboardListener = new Keyboard(loggedRecording);
 		
