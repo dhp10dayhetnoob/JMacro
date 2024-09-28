@@ -16,7 +16,7 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 
 public class Recorder implements EventListener {
 	private static final double EPSILON = 0.005;
-	private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+	private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
 	public static int RECORD_HOTKEY = NativeKeyEvent.VC_F1;
 	public static int PLAYBACK_HOTKEY = NativeKeyEvent.VC_F2;
 	private static final int TARGET_DELAY = 16; //target delay in milliseconds, runs at ca. 62.5 fps

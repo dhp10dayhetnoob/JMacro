@@ -96,7 +96,7 @@ public class GUI implements NativeKeyListener {
 
     private void createAndShowGUI() {
         // Create the JFrame (window) without borders
-        frame = new JFrame("Top Bar");
+        frame = new JFrame("JMacro");
         frame.setUndecorated(true); // Removes window borders
         frame.setAlwaysOnTop(true); // Keep it always on top of other windows
         frame.setResizable(false); // Not resizable
@@ -209,10 +209,32 @@ public class GUI implements NativeKeyListener {
                 frame.setAlwaysOnTop(isSelected);
             }
         });
+        
+        JCheckBoxMenuItem stickToTop = new JCheckBoxMenuItem("Stick to Top");
+        stickToTop.setSelected(true);
+        stickToTop.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean isSelected = stickToTop.isSelected();
+                frame.dispose();
+                frame.setUndecorated(isSelected);
+                frame.pack();
+                
+                if (isSelected) {
+                	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                    int frameWidth = frame.getWidth();
+                    int xPos = (screenSize.width / 2) - (frameWidth / 2); // Center horizontally
+                    frame.setLocation(xPos, 0); // Stick to the top of the screen
+                }
+                
+                frame.setVisible(true);
+            }
+        });
 
         // Add the checkbox item to the popup menu
         optionsMenu.add(checkBoxMenuItem);
         optionsMenu.add(alwaysOnTop);
+        optionsMenu.add(stickToTop);
 
         // Add menu items for setting keybinds
         JMenuItem setRecordHotkey = new JMenuItem("Set Record Hotkey");
@@ -276,10 +298,6 @@ public class GUI implements NativeKeyListener {
                 	
                     Recorder.RECORD_HOTKEY = selectedKey; // Update the record hotkey
                     labelRecording.setText(String.format(TOPBAR_FORMAT, "Record", KeyEvent.getKeyText(e.getKeyCode()))); // Update the label to show the new hotkey
-                    labelRecording.revalidate();
-                    labelRecording.repaint();
-                    labelRecording.getParent().revalidate();
-                    labelRecording.getParent().repaint();
                 } else {
                 	if (selectedKey == Recorder.RECORD_HOTKEY) {
                 		JOptionPane.showMessageDialog(null, "Keybind already used!");
@@ -288,10 +306,6 @@ public class GUI implements NativeKeyListener {
                 	
                     Recorder.PLAYBACK_HOTKEY = selectedKey; // Update the playback hotkey
                     labelPlayback.setText(String.format(TOPBAR_FORMAT, "Play/Stop", KeyEvent.getKeyText(e.getKeyCode()))); // Update the label to show the new hotkey
-                    labelPlayback.revalidate();
-                    labelPlayback.repaint();
-                    labelPlayback.getParent().revalidate();
-                    labelPlayback.getParent().repaint();
                 }
                 
                 interrupt = false;
@@ -331,6 +345,7 @@ public class GUI implements NativeKeyListener {
             try (FileInputStream fis = new FileInputStream(file);
                 ObjectInputStream ois = new ObjectInputStream(fis)) {
                 parent.loggedRecording = (ArrayList<InputObject>) ois.readObject();
+                frame.setTitle("JMacro - " + file.getName());
                 JOptionPane.showMessageDialog(null, "Import Successful!");
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
