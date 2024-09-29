@@ -140,7 +140,6 @@ public class Recorder implements EventListener {
 
     @Override
     public void onEventTriggered(int type, boolean enabled) {
-    	System.out.println(type + " " + currentState);
         switch (currentState) {
             case IDLE:
                 if (type == 1 && enabled) { // Start recording

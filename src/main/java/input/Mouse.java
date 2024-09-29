@@ -6,6 +6,7 @@ import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseMotionListener;
 
+import jdk.internal.org.jline.terminal.MouseEvent;
 import main.EventListener;
 
 public class Mouse implements NativeMouseListener, NativeMouseMotionListener, EventListener  {

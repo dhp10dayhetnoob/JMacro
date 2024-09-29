@@ -24,6 +24,12 @@ public class Options {
         optionsMenu.setBorder(new LineBorder(Color.WHITE, 1)); // Remove default border
 
         Font menuFont = new Font("Arial", Font.PLAIN, 16); // Match the font
+        
+        JMenuItem macroEditor = new JMenuItem("Open Macro Editor");
+        macroEditor.setForeground(Color.WHITE);
+        macroEditor.setFont(menuFont);
+        macroEditor.setBackground(new Color(0, 0, 0, 255)); // Match background color
+        macroEditor.setBorder(new EmptyBorder(5, 10, 5, 10));
 
         // Continuous Playback Checkbox
         JCheckBoxMenuItem checkBoxMenuItem = new JCheckBoxMenuItem("Continuous Playback");
@@ -52,6 +58,8 @@ public class Options {
         optionsMenu.add(new JSeparator());
         optionsMenu.add(createSetHotkeyItem("Set Pause Hotkey", 3, menuFont));
         optionsMenu.add(new JSeparator());
+        optionsMenu.add(macroEditor);
+        optionsMenu.add(new JSeparator());
         
         // Add monitor size and resolution input field
         optionsMenu.add(createSizeAndResolutionField(menuFont, "Recording"));
@@ -63,8 +71,12 @@ public class Options {
             @Override
             public void mouseClicked(MouseEvent e) {
                 // Show the popup menu at the location of the click
-                optionsMenu.show(parent.labelOptions, e.getX(), e.getY());
+            	optionsMenu.show(parent.labelOptions, e.getX(), e.getY());
             }
+        });
+        
+        macroEditor.addActionListener(e -> {
+        	new MacroEditor(parent.parent.getRecording());
         });
     }
 

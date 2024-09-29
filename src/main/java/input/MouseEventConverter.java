@@ -16,8 +16,8 @@ public class MouseEventConverter {
     static {
         // Letters
     	mouseMap.put(NativeMouseEvent.BUTTON1, InputEvent.BUTTON1_DOWN_MASK);
-    	mouseMap.put(NativeMouseEvent.BUTTON2, InputEvent.BUTTON2_DOWN_MASK);
-    	mouseMap.put(NativeMouseEvent.BUTTON3, InputEvent.BUTTON3_DOWN_MASK);
+    	mouseMap.put(NativeMouseEvent.BUTTON2, InputEvent.BUTTON3_DOWN_MASK);
+    	mouseMap.put(NativeMouseEvent.BUTTON3, InputEvent.BUTTON2_DOWN_MASK);
         // Other common keys can be added here...
     }
 
