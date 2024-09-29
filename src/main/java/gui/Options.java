@@ -230,7 +230,7 @@ public class Options {
             }
         });
 
-        keybindDialog.setAlwaysOnTop(true); // Ensure the dialog is always on top
+        //keybindDialog.setAlwaysOnTop(true); // Ensure the dialog is always on top
         keybindDialog.setUndecorated(true); // Remove borders
         keybindDialog.setLocationRelativeTo(null); // Center the dialog
         keybindDialog.setVisible(true); // Show the dialog
