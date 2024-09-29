@@ -25,7 +25,7 @@ public class Keyboard implements NativeKeyListener, EventListener {
 	@Override
 	public void nativeKeyPressed(NativeKeyEvent e) {
 		int keyCode = e.getKeyCode();
-		if (!enabled || keyCode == Recorder.PLAYBACK_HOTKEY || keyCode == Recorder.RECORD_HOTKEY) {
+		if (!enabled || keyCode == Recorder.PLAYBACK_HOTKEY || keyCode == Recorder.RECORD_HOTKEY || keyCode == Recorder.PAUSE_HOTKEY) {
 			return;
 		}
 		
@@ -37,7 +37,7 @@ public class Keyboard implements NativeKeyListener, EventListener {
 	@Override
 	public void nativeKeyReleased(NativeKeyEvent e) {
 		int keyCode = e.getKeyCode();
-		if (!enabled || keyCode == Recorder.PLAYBACK_HOTKEY || keyCode == Recorder.RECORD_HOTKEY) {
+		if (!enabled || keyCode == Recorder.PLAYBACK_HOTKEY || keyCode == Recorder.RECORD_HOTKEY || keyCode == Recorder.PAUSE_HOTKEY) {
 			return;
 		}
 		
@@ -46,7 +46,7 @@ public class Keyboard implements NativeKeyListener, EventListener {
 	}
 	
 	@Override
-	public void onEventTriggered(int type, boolean enabled, boolean authorative) {
+	public void onEventTriggered(int type, boolean enabled) {
 		if (type == 1) {
 			this.enabled = enabled;
 			

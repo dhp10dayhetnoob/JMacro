@@ -34,11 +34,13 @@ public class MainFrame implements NativeKeyListener {
 	private List<EventListener> listeners = new ArrayList<EventListener>();
 	private boolean recording;
 	private boolean playing;
+	private boolean paused;
 	
 	boolean interrupt;
 	Recorder parent;
 	JLabel labelRecording;
 	JLabel labelPlayback;
+	JLabel labelPaused;
 	JLabel labelOptions;
 	JFrame frame;
 	
@@ -50,7 +52,7 @@ public class MainFrame implements NativeKeyListener {
         });
     }
     
-    public void setRecording(boolean enabled, boolean authorative) {
+    public void setRecording(boolean enabled) {
     	recording = enabled;
     	
     	if (enabled) {
@@ -58,16 +60,13 @@ public class MainFrame implements NativeKeyListener {
     	} else {
     		labelRecording.setForeground(Color.WHITE);
     	}
-    	
-    	labelRecording.revalidate();
-    	labelRecording.repaint();
 
     	for (EventListener listener : listeners) {
-            listener.onEventTriggered(1, recording, authorative);
+            listener.onEventTriggered(1, recording);
         }
     }
     
-    public void setPlaying(boolean enabled, boolean authorative) {
+    public void setPlaying(boolean enabled) {
     	playing = enabled;
     	
     	if (enabled) {
@@ -76,12 +75,23 @@ public class MainFrame implements NativeKeyListener {
     		labelPlayback.setForeground(Color.WHITE);
     	}
     	
-    	labelPlayback.revalidate();
-    	labelPlayback.repaint();
+    	for (EventListener listener : listeners) {
+            listener.onEventTriggered(2, playing);
+        }
+    }
+    
+    public void setPaused(boolean enabled) {
+    	paused = enabled;
+    	
+    	if (enabled) {
+    		labelPaused.setForeground(Color.RED);
+    	} else {
+    		labelPaused.setForeground(Color.WHITE);
+    	}
     	
     	for (EventListener listener : listeners) {
-            listener.onEventTriggered(2, playing, authorative);
-        }
+    		listener.onEventTriggered(3, paused);
+    	}
     }
     
     public boolean isRecording() {
@@ -90,6 +100,10 @@ public class MainFrame implements NativeKeyListener {
     
     public boolean isPlaying() {
     	return playing;
+    }
+    
+    public boolean isPaused() {
+    	return paused;
     }
     
     public void addListener(EventListener listener) {
@@ -118,6 +132,7 @@ public class MainFrame implements NativeKeyListener {
         // Create labels (or buttons) for "A", "B", "C", "D"
         labelRecording = new JLabel(String.format(TOPBAR_FORMAT, "Record", "F1"));
         labelPlayback = new JLabel(String.format(TOPBAR_FORMAT, "Play/Stop", "F2"));
+        labelPaused = new JLabel(String.format(TOPBAR_FORMAT, "Pause", "F3"));
         labelOptions = new JLabel("Options"); // Change label to reflect that it's clickable
         JLabel btnExport = new JLabel("Export");
         JLabel btnImport = new JLabel("Import");
@@ -126,12 +141,14 @@ public class MainFrame implements NativeKeyListener {
         labelRecording.setForeground(Color.WHITE);
         labelPlayback.setForeground(Color.WHITE);
         labelOptions.setForeground(Color.WHITE);
+        labelPaused.setForeground(Color.WHITE);
         btnExport.setForeground(Color.WHITE);
         btnImport.setForeground(Color.WHITE);
 
         Font labelFont = new Font("Arial", Font.PLAIN, 18);
         labelRecording.setFont(labelFont);
         labelPlayback.setFont(labelFont);
+        labelPaused.setFont(labelFont);
         labelOptions.setFont(labelFont);
         btnExport.setFont(labelFont);
         btnImport.setFont(labelFont);
@@ -142,6 +159,10 @@ public class MainFrame implements NativeKeyListener {
         topBarPanel.add(new JSeparator(SwingConstants.VERTICAL));
         topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
         topBarPanel.add(labelPlayback);
+        topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
+        topBarPanel.add(new JSeparator(SwingConstants.VERTICAL));
+        topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
+        topBarPanel.add(labelPaused);
         topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
         topBarPanel.add(new JSeparator(SwingConstants.VERTICAL));
         topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
@@ -197,9 +218,11 @@ public class MainFrame implements NativeKeyListener {
     	}
     	
     	if (e.getKeyCode() == Recorder.RECORD_HOTKEY) {
-    		setRecording(!recording, false);
+    		setRecording(!recording);
     	} else if (e.getKeyCode() == Recorder.PLAYBACK_HOTKEY) {
-    		setPlaying(!playing, false);
+    		setPlaying(!playing);
+    	} else if (e.getKeyCode() == Recorder.PAUSE_HOTKEY) {
+    		setPaused(!paused);
     	}
     }
 }
