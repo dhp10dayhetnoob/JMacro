@@ -200,7 +200,7 @@ public class MainFrame implements NativeKeyListener {
             public void mouseClicked(MouseEvent e) {
         		ArrayList<InputObject> importedRecording = Files.importRecording(frame);
         		if (importedRecording != null) {
-        			parent.setRecording(Files.importRecording(frame));
+        			parent.setRecording(importedRecording);
         		}
             }
         });

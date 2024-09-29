@@ -52,6 +52,8 @@ public final class Files {
             try (FileOutputStream fos = new FileOutputStream(file);
                 ObjectOutputStream oos = new ObjectOutputStream(fos)) {
                 oos.writeObject(object);
+                fos.close();
+                oos.close();
                 JOptionPane.showMessageDialog(null, "Export Successful!");
             } catch (IOException e) {
                 e.printStackTrace();
