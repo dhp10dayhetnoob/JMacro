@@ -10,7 +10,7 @@ import jdk.internal.org.jline.terminal.MouseEvent;
 import main.EventListener;
 
 public class Mouse implements NativeMouseListener, NativeMouseMotionListener, EventListener  {
-	private static final double MOUSE_MOVE_THROTTLE = .033; //max 30 mouse moves a second
+	private static double MOUSE_MOVE_THROTTLE = .033; //max 30 mouse moves a second
 	private static final double MOUSE_MOVE_TIMESHIFT = 0.001;
 	private double nextMouseMove;
 	private double recordingStartTime; //use this instead of using RecordingList !!!
@@ -26,6 +26,10 @@ public class Mouse implements NativeMouseListener, NativeMouseMotionListener, Ev
 	
 	public void overWriteRecording(ArrayList<InputObject> loggedRecording) {
 		this.loggedRecording = loggedRecording;
+	}
+	
+	public static void setMouseThrottle(double throttle) {
+		MOUSE_MOVE_THROTTLE = throttle;
 	}
 	
 	// Handle mouse button press events

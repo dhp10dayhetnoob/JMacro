@@ -26,6 +26,7 @@ public class InputSimulator {
 		
 	    try {
 	        ROBOT = new Robot();
+	        ROBOT.setAutoWaitForIdle(true);
 	    } catch (final Exception ex) {
 	        throw new RuntimeException("Failed to create Robot instance in static block.", ex);
 	    }
@@ -50,26 +51,30 @@ public class InputSimulator {
 			return;
 		}
 		
-		try {
-			if (type == 3) {
-				ROBOT.mouseMove((int) (input.getMouseX() * widthMultiplier), (int) (input.getMouseY() * heightMultiplier));
-			} else if (type == 2) {
-				boolean isDown = input.getIsUpOrDown();
-				if (isDown) {
-					ROBOT.mousePress(input.getKeyOrButton());
-				} else {
-					ROBOT.mouseRelease(input.getKeyOrButton());
-				}
-			} else if (type == 1) {
-				boolean isDown = input.getIsUpOrDown();
-				if (isDown) {
-					ROBOT.keyPress(input.getKeyOrButton());
-				} else {
-					ROBOT.keyRelease(input.getKeyOrButton());
-				}
+		if (type == 3) {
+			ROBOT.mouseMove((int) (input.getMouseX() * widthMultiplier), (int) (input.getMouseY() * heightMultiplier));
+		} else if (type == 2) {
+			if (input.getKeyOrButton() == -1) {
+				return;
 			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			
+			boolean isDown = input.getIsUpOrDown();
+			if (isDown) {
+				ROBOT.mousePress(input.getKeyOrButton());
+		} else {
+				ROBOT.mouseRelease(input.getKeyOrButton());
+			}
+		} else if (type == 1) {
+			if (input.getKeyOrButton() == -1) {
+				return;
+			}
+			
+			boolean isDown = input.getIsUpOrDown();
+			if (isDown) {
+				ROBOT.keyPress(input.getKeyOrButton());
+			} else {
+				ROBOT.keyRelease(input.getKeyOrButton());
+			}
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.*;
+import input.Mouse;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -61,8 +62,11 @@ public class Options {
         optionsMenu.add(macroEditor);
         optionsMenu.add(new JSeparator());
         
+        optionsMenu.add(createStyledSlider(menuFont, "<html>Mouse Movement<br>Capture Frequency<html>", 10, 45, 30));
+        optionsMenu.add(new JSeparator());
+        
         // Add monitor size and resolution input field
-        optionsMenu.add(createSizeAndResolutionField(menuFont, "Recording"));
+        optionsMenu.add(createSizeAndResolutionField(menuFont, "Recorded"));
         optionsMenu.add(new JSeparator());
         optionsMenu.add(createSizeAndResolutionField(menuFont, "Current"));
 
@@ -94,6 +98,47 @@ public class Options {
         });
 
         return alwaysOnTop;
+    }
+    
+    private JPanel createStyledSlider(Font menuFont, String title, int min, int max, int initialValue) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel.setBackground(new Color(0, 0, 0, 255)); // Match background color
+        
+        JLabel label = new JLabel(title + ": ");
+        label.setForeground(Color.WHITE);
+        label.setFont(menuFont);
+        
+        // Create the slider
+        JSlider slider = new JSlider(JSlider.HORIZONTAL, min, max, initialValue);
+        slider.setBackground(new Color(0, 0, 0, 255)); // Match background color
+        slider.setForeground(Color.WHITE); // Match text color
+        slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+        slider.setMajorTickSpacing((max - min) / 5); // Adjust tick spacing
+        slider.setMinorTickSpacing((max - min) / 10);
+        slider.setFont(menuFont); // Match font
+
+        // Optional: Add a border to the slider
+        slider.setBorder(new EmptyBorder(5, 10, 5, 10));
+
+        // Create a label to display the current value of the slider
+        JLabel valueLabel = new JLabel(String.valueOf(initialValue) + "/s");
+        valueLabel.setForeground(Color.WHITE);
+        valueLabel.setFont(menuFont);
+
+        // Add a change listener to update the value label when the slider is adjusted
+        slider.addChangeListener(e -> {
+            valueLabel.setText(String.valueOf(slider.getValue()) + "/s");
+            // Optionally, call any method to handle the value change
+            Mouse.setMouseThrottle(1d/(double) slider.getValue());
+        });
+
+        // Add the label, slider, and value label to the panel
+        panel.add(label);
+        panel.add(slider);
+        panel.add(valueLabel);
+
+        return panel;
     }
 
     private JMenuItem createStickToTopItem(Font menuFont) {
