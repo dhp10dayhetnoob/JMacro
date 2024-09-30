@@ -27,7 +27,7 @@ public final class Files {
             try (FileInputStream fis = new FileInputStream(file);
                 ObjectInputStream ois = new ObjectInputStream(fis)) {
                 JOptionPane.showMessageDialog(null, "Import Successful!");
-                frame.setTitle("JFrame - " + file.getName());
+                frame.setTitle("JMacro - " + file.getName());
                 return (ArrayList<InputObject>) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
