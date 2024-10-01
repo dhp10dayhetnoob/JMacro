@@ -1,25 +1,34 @@
 package main;
 
 import java.awt.Dimension;
+import java.awt.GraphicsDevice;
+import java.awt.MouseInfo;
 import java.awt.Robot;
 import java.awt.Toolkit;
+
+import javax.swing.JOptionPane;
 
 import input.InputObject;
 
 public class InputSimulator {
-	public static final Robot ROBOT;
+	public static Robot ROBOT;
 	private static int currentWidth;
 	private static int currentHeight;
 	private static int recordedWidth;
 	private static int recordedHeight;
+	private static GraphicsDevice currentDevice = MouseInfo.getPointerInfo().getDevice();;
 	
 	private static double widthMultiplier = 1;
 	private static double heightMultiplier = 1;
 	
 	//not very pretty i know
 	static {
-	    try {
-	        ROBOT = new Robot();
+	    resetGraphicDevice();
+	}
+	
+	public static void resetGraphicDevice() {
+		try {
+	        ROBOT = new Robot(currentDevice);
 	        ROBOT.setAutoWaitForIdle(true);
 	    } catch (final Exception ex) {
 	        throw new RuntimeException("Failed to create Robot instance in static block.", ex);
@@ -46,6 +55,12 @@ public class InputSimulator {
 		}
 		
 		if (type == 3) {
+			GraphicsDevice device = MouseInfo.getPointerInfo().getDevice();
+			if (currentDevice != device) {
+				currentDevice = device;
+				resetGraphicDevice();
+			}
+			
 			ROBOT.mouseMove((int) (input.getMouseX() * widthMultiplier), (int) (input.getMouseY() * heightMultiplier));
 		} else if (type == 2) {
 			if (input.getKeyOrButton() == -1) {
