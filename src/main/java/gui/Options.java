@@ -14,7 +14,6 @@ import main.Recorder;
 
 public class Options {
     private MainFrame parent;
-    private JTextField sizeField; // Single text field for size and resolution
 
     public Options(MainFrame parent) {
         this.parent = parent;
@@ -34,7 +33,7 @@ public class Options {
 
         // Continuous Playback Checkbox
         JCheckBoxMenuItem checkBoxMenuItem = new JCheckBoxMenuItem("Continuous Playback");
-        checkBoxMenuItem.setSelected(false); // Default state
+        checkBoxMenuItem.setSelected(Recorder.settings.getBoolean("ContinousPlayback", false)); // Default state
         checkBoxMenuItem.setBackground(new Color(0, 0, 0, 255)); // Match background color
         checkBoxMenuItem.setForeground(Color.WHITE); // Match text color
         checkBoxMenuItem.setFont(menuFont); // Match font
@@ -42,6 +41,7 @@ public class Options {
         checkBoxMenuItem.addActionListener(e -> {
             boolean isSelected = checkBoxMenuItem.isSelected();
             parent.parent.setContinuousPlayback(isSelected);
+            Recorder.settings.putBoolean("ContinousPlayback", isSelected);
         });
 
         // Add checkboxes
@@ -62,7 +62,9 @@ public class Options {
         optionsMenu.add(macroEditor);
         optionsMenu.add(new JSeparator());
         
-        optionsMenu.add(createStyledSlider(menuFont, "<html>Mouse Movement<br>Capture Frequency<html>", 10, 45, 30));
+        int defaultSliderValue = Recorder.settings.getInt("MOUSE_SLIDER", 30);
+        Mouse.setMouseThrottle(1d/(double) defaultSliderValue);
+        optionsMenu.add(createStyledSlider(menuFont, "<html>Mouse Movement<br>Capture Frequency<html>", 10, 45, defaultSliderValue));
         optionsMenu.add(new JSeparator());
         
         // Add monitor size and resolution input field
@@ -86,7 +88,7 @@ public class Options {
 
     private JMenuItem createAlwaysOnTopItem(Font menuFont) {
         JCheckBoxMenuItem alwaysOnTop = new JCheckBoxMenuItem("Always on Top");
-        alwaysOnTop.setSelected(true); // Default state
+        alwaysOnTop.setSelected(Recorder.settings.getBoolean("AlwaysOnTop", true)); // Default state
         alwaysOnTop.setBackground(new Color(0, 0, 0, 255)); // Match background color
         alwaysOnTop.setForeground(Color.WHITE); // Match text color
         alwaysOnTop.setFont(menuFont); // Match font
@@ -95,6 +97,7 @@ public class Options {
         alwaysOnTop.addActionListener(e -> {
             boolean isSelected = alwaysOnTop.isSelected();
             parent.frame.setAlwaysOnTop(isSelected);
+            Recorder.settings.putBoolean("AlwaysOnTop", isSelected);
         });
 
         return alwaysOnTop;
@@ -131,6 +134,7 @@ public class Options {
             valueLabel.setText(String.valueOf(slider.getValue()) + "/s");
             // Optionally, call any method to handle the value change
             Mouse.setMouseThrottle(1d/(double) slider.getValue());
+            Recorder.settings.putInt("MOUSE_SLIDER", slider.getValue());
         });
 
         // Add the label, slider, and value label to the panel
@@ -143,7 +147,7 @@ public class Options {
 
     private JMenuItem createStickToTopItem(Font menuFont) {
         JCheckBoxMenuItem stickToTop = new JCheckBoxMenuItem("Stick to Top");
-        stickToTop.setSelected(true); // Default state
+        stickToTop.setSelected(Recorder.settings.getBoolean("StickToTop", true)); // Default state
         stickToTop.setBackground(new Color(0, 0, 0, 255)); // Match background color
         stickToTop.setForeground(Color.WHITE); // Match text color
         stickToTop.setFont(menuFont); // Match font
@@ -155,6 +159,8 @@ public class Options {
             parent.frame.setUndecorated(isSelected);
             parent.frame.pack();
 
+            Recorder.settings.putBoolean("StickToTop", isSelected);
+            
             if (isSelected) {
                 Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
                 int frameWidth = parent.frame.getWidth();
@@ -184,14 +190,18 @@ public class Options {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel.setBackground(new Color(0, 0, 0, 255)); // Match background color
 
-        sizeField = new JTextField(10); // Single text field for input
+        JTextField sizeField = new JTextField(10); // Single text field for input
         sizeField.setBackground(new Color(0, 0, 0, 255));
         sizeField.setForeground(Color.WHITE);
         sizeField.setBorder(new LineBorder(Color.GRAY, 1));
         sizeField.setFont(menuFont);
         
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        sizeField.setText((int) screenSize.getWidth() + "x" + (int) screenSize.getHeight()); // Initialize with current size
+        int defaultWidth = Recorder.settings.getInt(title + "Width", (int) screenSize.getWidth());
+        int defaultHeight = Recorder.settings.getInt(title + "Height", (int) screenSize.getHeight());
+        System.out.println(title + " " + defaultWidth + "x" + defaultHeight);
+        sizeField.setText(defaultWidth + "x" + defaultHeight); // Initialize with current size
+        InputSimulator.setResolution(title, defaultWidth, defaultHeight);
 
         JButton setSizeButton = new JButton("Set " + title + " Resolution");
         setSizeButton.setBackground(new Color(0, 0, 0, 255)); // Match background color
@@ -205,6 +215,8 @@ public class Options {
                     int width = Integer.parseInt(parts[0].trim());
                     int height = Integer.parseInt(parts[1].trim());
                     InputSimulator.setResolution(title, width, height);
+                    Recorder.settings.putInt(title + "Width", width);
+                    Recorder.settings.putInt(title + "Height", height);
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(panel, "Please enter valid numbers.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
                 }
@@ -263,6 +275,7 @@ public class Options {
                     }
 
                     Recorder.RECORD_HOTKEY = selectedKey; // Update the record hotkey
+                    Recorder.settings.put("RECORD_HOTKEY", Integer.toString(selectedKey));
                     parent.labelRecording.setText(String.format(MainFrame.TOPBAR_FORMAT, "Record", KeyEvent.getKeyText(e.getKeyCode()))); // Update the label to show the new hotkey
                 } else if (whichKey == 2) {
                     if (selectedKey == Recorder.RECORD_HOTKEY || selectedKey == Recorder.PAUSE_HOTKEY) {
@@ -271,7 +284,8 @@ public class Options {
                     }
 
                     Recorder.PLAYBACK_HOTKEY = selectedKey; // Update the playback hotkey
-                    parent.labelPlayback.setText(String.format(MainFrame.TOPBAR_FORMAT, "Playback", KeyEvent.getKeyText(e.getKeyCode()))); // Update the label to show the new hotkey
+                    Recorder.settings.put("PLAYBACK_HOTKEY", Integer.toString(selectedKey));
+                    parent.labelPlayback.setText(String.format(MainFrame.TOPBAR_FORMAT, "Play/Stop", KeyEvent.getKeyText(e.getKeyCode()))); // Update the label to show the new hotkey
                 } else if (whichKey == 3) {
                 	if (selectedKey == Recorder.PLAYBACK_HOTKEY || selectedKey == Recorder.RECORD_HOTKEY) {
                 		JOptionPane.showMessageDialog(null, "Keybind already used!");
@@ -279,6 +293,7 @@ public class Options {
                     }
 
                     Recorder.PAUSE_HOTKEY = selectedKey; // Update the record hotkey
+                    Recorder.settings.put("PAUSE_HOTKEY", Integer.toString(selectedKey));
                     parent.labelPaused.setText(String.format(MainFrame.TOPBAR_FORMAT, "Pause", KeyEvent.getKeyText(e.getKeyCode()))); // Update the label to show the new hotkey
                 }
 

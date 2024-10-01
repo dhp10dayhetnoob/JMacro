@@ -18,8 +18,16 @@ public class Keyboard implements NativeKeyListener, EventListener {
 		enabled = false;
 	}
 	
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+	
 	public void overWriteRecording(ArrayList<InputObject> loggedRecording) {
 		this.loggedRecording = loggedRecording;
+	}
+	
+	public void addToStartTime(double time) {
+		this.recordingStartTime = this.recordingStartTime + time;
 	}
 		 
 	@Override

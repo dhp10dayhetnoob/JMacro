@@ -18,12 +18,6 @@ public class InputSimulator {
 	
 	//not very pretty i know
 	static {
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		currentWidth = (int) screenSize.getWidth();
-		currentHeight = (int) screenSize.getHeight();
-		recordedWidth = (int) screenSize.getWidth();
-		recordedHeight = (int) screenSize.getHeight();
-		
 	    try {
 	        ROBOT = new Robot();
 	        ROBOT.setAutoWaitForIdle(true);

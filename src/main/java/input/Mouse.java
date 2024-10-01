@@ -24,12 +24,20 @@ public class Mouse implements NativeMouseListener, NativeMouseMotionListener, Ev
 		nextMouseMove = 0;
 	}
 	
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+	
 	public void overWriteRecording(ArrayList<InputObject> loggedRecording) {
 		this.loggedRecording = loggedRecording;
 	}
 	
 	public static void setMouseThrottle(double throttle) {
 		MOUSE_MOVE_THROTTLE = throttle;
+	}
+	
+	public void addToStartTime(double time) {
+		this.recordingStartTime = this.recordingStartTime + time;
 	}
 	
 	// Handle mouse button press events

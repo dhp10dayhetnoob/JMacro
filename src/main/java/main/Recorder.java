@@ -10,12 +10,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.prefs.Preferences;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 
 public class Recorder implements EventListener {
+	public static Preferences settings = Preferences.userNodeForPackage(Recorder.class);
     private enum State {
         IDLE,
         RECORDING,
@@ -27,14 +29,15 @@ public class Recorder implements EventListener {
     private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
     private static final int TARGET_DELAY = 16; // target delay in milliseconds
 
-    public static int RECORD_HOTKEY = NativeKeyEvent.VC_F1;
-    public static int PLAYBACK_HOTKEY = NativeKeyEvent.VC_F2;
-    public static int PAUSE_HOTKEY = NativeKeyEvent.VC_F3;
+    public static int RECORD_HOTKEY = Integer.parseInt(settings.get("RECORD_HOTKEY", Integer.toString(NativeKeyEvent.VC_F1)));
+    public static int PLAYBACK_HOTKEY = Integer.parseInt(settings.get("PLAYBACK_HOTKEY", Integer.toString(NativeKeyEvent.VC_F2)));
+    public static int PAUSE_HOTKEY = Integer.parseInt(settings.get("PAUSE_HOTKEY", Integer.toString(NativeKeyEvent.VC_F3)));
 
     private State currentState = State.IDLE; // Initial state
     private double recordingStartTime;
     private double previousTime;
     private double runTime;
+    private double pauseRecordingTime;
 
     private ArrayList<InputObject> loggedRecording;
     private int iterator;
@@ -45,7 +48,7 @@ public class Recorder implements EventListener {
 
     private ScheduledFuture<?> scheduledFuture;
 
-    private boolean continuousPlayback;
+    private boolean continuousPlayback = settings.getBoolean("ContinousPlayback", false);
 
     public static void main(String[] args) {
         new Recorder();
@@ -189,7 +192,10 @@ public class Recorder implements EventListener {
                     run();
                     System.out.println("Playback started");
                 } else if (type == 3 && enabled) {
-                	gui.setPaused(false);
+                	this.pauseRecordingTime = System.nanoTime();
+                	this.mouseListener.setEnabled(false);
+        			this.keyboardListener.setEnabled(false);
+                	currentState = State.PAUSED;
                 } 
                 break;
 
@@ -215,10 +221,18 @@ public class Recorder implements EventListener {
             	if (type == 1 && enabled) {
             		gui.setRecording(false);
             	} else if (type == 3 && !enabled) { // Resume playback
-                    currentState = State.PLAYING;
-                    run(); // Restart the playback logic
-                    gui.setPlaying(true);
-                    System.out.println("Playback resumed");
+            		if (gui.isPlaying()) {
+	                    currentState = State.PLAYING;
+	                    run(); // Restart the playback logic
+	                    gui.setPlaying(true);
+            		} else if (gui.isRecording()) {
+            			double time = (System.nanoTime() - pauseRecordingTime);
+            			this.mouseListener.setEnabled(true);
+            			this.keyboardListener.setEnabled(true);
+            			this.mouseListener.addToStartTime(time);
+            			this.keyboardListener.addToStartTime(time);
+            			currentState = State.RECORDING;
+            		}
                 } else if (type == 2 && !enabled) { // Stop playback
                     currentState = State.IDLE;
                     if (scheduledFuture != null && !scheduledFuture.isCancelled()) {
@@ -226,6 +240,9 @@ public class Recorder implements EventListener {
                     }
                     gui.setPaused(false);
                     System.out.println("Playback stopped from paused state");
+                } else if (type == 1 && !enabled) {
+                	gui.setPaused(false);
+                	currentState = State.IDLE;
                 }
                 break;
         }

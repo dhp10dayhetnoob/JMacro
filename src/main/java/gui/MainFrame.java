@@ -113,8 +113,8 @@ public class MainFrame implements NativeKeyListener {
     private void createAndShowGUI() {
         // Create the JFrame (window) without borders
         frame = new JFrame("JMacro");
-        frame.setUndecorated(true); // Removes window borders
-        frame.setAlwaysOnTop(true); // Keep it always on top of other windows
+        frame.setUndecorated(Recorder.settings.getBoolean("StickToTop", true)); // Removes window borders
+        frame.setAlwaysOnTop(Recorder.settings.getBoolean("AlwaysOnTop", true)); // Keep it always on top of other windows
         frame.setResizable(false); // Not resizable
         
         frame.addWindowListener(new WindowAdapter() {
@@ -130,9 +130,9 @@ public class MainFrame implements NativeKeyListener {
         topBarPanel.setBackground(new Color(0, 0, 0, 255)); // Semi-transparent black background
 
         // Create labels (or buttons) for "A", "B", "C", "D"
-        labelRecording = new JLabel(String.format(TOPBAR_FORMAT, "Record", "F1"));
-        labelPlayback = new JLabel(String.format(TOPBAR_FORMAT, "Play/Stop", "F2"));
-        labelPaused = new JLabel(String.format(TOPBAR_FORMAT, "Pause", "F3"));
+        labelRecording = new JLabel(String.format(TOPBAR_FORMAT, "Record", NativeKeyEvent.getKeyText(Recorder.RECORD_HOTKEY)));
+        labelPlayback = new JLabel(String.format(TOPBAR_FORMAT, "Play/Stop", NativeKeyEvent.getKeyText(Recorder.PLAYBACK_HOTKEY)));
+        labelPaused = new JLabel(String.format(TOPBAR_FORMAT, "Pause", NativeKeyEvent.getKeyText(Recorder.PAUSE_HOTKEY)));
         labelOptions = new JLabel("Options"); // Change label to reflect that it's clickable
         JLabel btnExport = new JLabel("Export");
         JLabel btnImport = new JLabel("Import");
