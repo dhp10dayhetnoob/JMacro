@@ -83,6 +83,7 @@ public class KeyEventConverter {
         keyMap.put(NativeKeyEvent.VC_RIGHT, KeyEvent.VK_RIGHT);
         keyMap.put(NativeKeyEvent.VC_UP, KeyEvent.VK_UP);
         keyMap.put(NativeKeyEvent.VC_DOWN, KeyEvent.VK_DOWN);
+       
 
         // Modifier keys
         keyMap.put(NativeKeyEvent.VC_SHIFT, KeyEvent.VK_SHIFT);

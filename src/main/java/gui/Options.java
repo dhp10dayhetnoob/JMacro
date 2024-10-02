@@ -34,6 +34,7 @@ public class Options {
         // Continuous Playback Checkbox
         JCheckBoxMenuItem checkBoxMenuItem = new JCheckBoxMenuItem("Continuous Playback");
         checkBoxMenuItem.setSelected(Recorder.settings.getBoolean("ContinousPlayback", false)); // Default state
+        parent.parent.setContinuousPlayback(checkBoxMenuItem.isSelected());
         checkBoxMenuItem.setBackground(new Color(0, 0, 0, 255)); // Match background color
         checkBoxMenuItem.setForeground(Color.WHITE); // Match text color
         checkBoxMenuItem.setFont(menuFont); // Match font
