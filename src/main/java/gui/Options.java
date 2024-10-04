@@ -56,6 +56,8 @@ public class Options {
         optionsMenu.add(new JSeparator());
         optionsMenu.add(setMonitorItem(menuFont));
         optionsMenu.add(new JSeparator());
+        optionsMenu.add(setMonitorVoidItem(menuFont));
+        optionsMenu.add(new JSeparator());
 
         // Add menu items for setting keybinds
         optionsMenu.add(createSetHotkeyItem("Set Record Hotkey", 1, menuFont));
@@ -171,7 +173,7 @@ public class Options {
     }
     
     private JMenuItem setMonitorItem(Font menuFont) {
-    	JMenuItem setHotkey = new JMenuItem("Set current Monitor");
+    	JMenuItem setHotkey = new JMenuItem("Set Current Monitor");
         setHotkey.setBackground(new Color(0, 0, 0, 255)); // Match background color
         setHotkey.setForeground(Color.WHITE); // Match text color
         setHotkey.setFont(menuFont); // Match font
@@ -180,6 +182,29 @@ public class Options {
         setHotkey.addActionListener(e -> {
         	InputSimulator.resetGraphicDevice();
         });
+
+        return setHotkey;
+    }
+    
+    private JMenuItem setMonitorVoidItem(Font menuFont) {
+    	JCheckBoxMenuItem setHotkey = new JCheckBoxMenuItem("Void Current Monitor");
+    	setHotkey.setSelected(Recorder.settings.getBoolean("void", true));
+        setHotkey.setBackground(new Color(0, 0, 0, 255)); // Match background color
+        setHotkey.setForeground(Color.WHITE); // Match text color
+        setHotkey.setFont(menuFont); // Match font
+        setHotkey.setBorder(new EmptyBorder(5, 10, 5, 10)); // Add padding
+
+        setHotkey.addActionListener(e -> {
+        	if (setHotkey.isSelected()) {
+        		InputSimulator.voidGraphicsDevice();
+        	} else {
+        		InputSimulator.resetGraphicDevice();
+        	}
+        });
+        
+        if (setHotkey.isSelected()) {
+        	InputSimulator.voidGraphicsDevice();
+        }
 
         return setHotkey;
     }

@@ -28,7 +28,17 @@ public class InputSimulator {
 	
 	public static void resetGraphicDevice() {
 		try {
+			currentDevice = MouseInfo.getPointerInfo().getDevice();
 	        ROBOT = new Robot(currentDevice);
+	        ROBOT.setAutoWaitForIdle(true);
+	    } catch (final Exception ex) {
+	        throw new RuntimeException("Failed to create Robot instance in static block.", ex);
+	    }
+	}
+	
+	public static void voidGraphicsDevice() {
+		try {
+	        ROBOT = new Robot();
 	        ROBOT.setAutoWaitForIdle(true);
 	    } catch (final Exception ex) {
 	        throw new RuntimeException("Failed to create Robot instance in static block.", ex);
