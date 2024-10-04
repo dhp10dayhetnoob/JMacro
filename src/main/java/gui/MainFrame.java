@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -43,6 +44,8 @@ public class MainFrame implements NativeKeyListener {
 	JLabel labelPaused;
 	JLabel labelOptions;
 	JFrame frame;
+	JLabel infoLabel;
+	JPanel infoBarPanel;
 	
     public MainFrame(Recorder parent) {
     	interrupt = false;
@@ -109,25 +112,46 @@ public class MainFrame implements NativeKeyListener {
     public void addListener(EventListener listener) {
     	listeners.add(listener);
     }
+    
+    public void setInfoLabelText(String text) {
+    	infoLabel.setText(text);
+    }
+    
+    public void enableInfo(boolean enabled) {
+    	infoBarPanel.setVisible(enabled);
+    	frame.pack();
+    }
+    
+    public boolean isInfoVisible() {
+    	return infoBarPanel.isVisible();
+    }
 
     private void createAndShowGUI() {
         // Create the JFrame (window) without borders
         frame = new JFrame("JMacro");
         frame.setUndecorated(Recorder.settings.getBoolean("StickToTop", true)); // Removes window borders
         frame.setAlwaysOnTop(Recorder.settings.getBoolean("AlwaysOnTop", true)); // Keep it always on top of other windows
+        frame.getContentPane().setBackground(new Color(0, 0, 0, 255));
         frame.setResizable(false); // Not resizable
         
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent ev) {
-            	System.exit(0);
+                System.exit(0);
             }
         });
+
+        // Set the layout for the frame's content pane to BorderLayout
+        frame.getContentPane().setLayout(new BorderLayout());
 
         // Create the top bar panel with horizontal layout
         JPanel topBarPanel = new JPanel();
         topBarPanel.setLayout(new BoxLayout(topBarPanel, BoxLayout.X_AXIS)); // Horizontal BoxLayout
         topBarPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // Add some padding
         topBarPanel.setBackground(new Color(0, 0, 0, 255)); // Semi-transparent black background
+
+        // Create the info bar panel
+        infoBarPanel = new JPanel();
+        infoBarPanel.setBackground(new Color(0, 0, 0, 255));
 
         // Create labels (or buttons) for "A", "B", "C", "D"
         labelRecording = new JLabel(String.format(TOPBAR_FORMAT, "Record", NativeKeyEvent.getKeyText(Recorder.RECORD_HOTKEY)));
@@ -136,7 +160,7 @@ public class MainFrame implements NativeKeyListener {
         labelOptions = new JLabel("Options"); // Change label to reflect that it's clickable
         JLabel btnExport = new JLabel("Export");
         JLabel btnImport = new JLabel("Import");
-        
+
         // Customize label appearance
         labelRecording.setForeground(Color.WHITE);
         labelPlayback.setForeground(Color.WHITE);
@@ -175,9 +199,17 @@ public class MainFrame implements NativeKeyListener {
         topBarPanel.add(new JSeparator(SwingConstants.VERTICAL));
         topBarPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
         topBarPanel.add(btnImport);
+        
+        infoLabel = new JLabel();
+        infoLabel.setFont(labelFont);
+        infoLabel.setForeground(Color.WHITE);
+        infoLabel.setPreferredSize(new Dimension(200, 20));
+        infoBarPanel.add(infoLabel);
 
-        // Add the top bar to the frame
-        frame.getContentPane().add(topBarPanel);
+        // Add the top bar and info bar to the frame's content pane using BorderLayout
+        frame.getContentPane().add(topBarPanel, BorderLayout.NORTH); // Add topBarPanel to the top
+        frame.getContentPane().add(infoBarPanel, BorderLayout.WEST); // Add infoBarPanel to the left
+
         frame.pack(); // Size the window to fit the content
 
         // Set the frame at the top-center of the screen
@@ -185,28 +217,27 @@ public class MainFrame implements NativeKeyListener {
         int frameWidth = frame.getWidth();
         int xPos = (screenSize.width / 2) - (frameWidth / 2); // Center horizontally
         frame.setLocation(xPos, 0); // Stick to the top of the screen
-        
+
         // Add action listeners for Import/Export
         btnExport.addMouseListener(new MouseAdapter() {
-        	@Override
+            @Override
             public void mouseClicked(MouseEvent e) {
-        		Files.exportRecording(parent.getRecording());
+                Files.exportRecording(parent.getRecording());
             }
         });
 
-     // Add action listeners for Import/Export
         btnImport.addMouseListener(new MouseAdapter() {
-        	@Override
+            @Override
             public void mouseClicked(MouseEvent e) {
-        		ArrayList<InputObject> importedRecording = Files.importRecording(frame);
-        		if (importedRecording != null) {
-        			parent.setRecording(importedRecording);
-        		}
+                ArrayList<InputObject> importedRecording = Files.importRecording(frame);
+                if (importedRecording != null) {
+                    parent.setRecording(importedRecording);
+                }
             }
         });
 
         new Options(this);
-        
+
         // Make the frame visible
         frame.setVisible(true);
     }

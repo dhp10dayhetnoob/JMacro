@@ -52,6 +52,10 @@ public class Options {
         optionsMenu.add(new JSeparator());
         optionsMenu.add(createStickToTopItem(menuFont));
         optionsMenu.add(new JSeparator());
+        optionsMenu.add(createShowPlaybackProgress(menuFont));
+        optionsMenu.add(new JSeparator());
+        optionsMenu.add(setMonitorItem(menuFont));
+        optionsMenu.add(new JSeparator());
 
         // Add menu items for setting keybinds
         optionsMenu.add(createSetHotkeyItem("Set Record Hotkey", 1, menuFont));
@@ -104,6 +108,26 @@ public class Options {
         return alwaysOnTop;
     }
     
+    private JMenuItem createShowPlaybackProgress(Font menuFont) {
+    	JCheckBoxMenuItem showPlayback = new JCheckBoxMenuItem("Show Playback Progress");
+    	showPlayback.setSelected(Recorder.settings.getBoolean("ShowPlaybackProgress", false));
+    	showPlayback.setBackground(new Color(0, 0, 0, 255)); // Match background color
+    	showPlayback.setForeground(Color.WHITE); // Match text color
+    	showPlayback.setFont(menuFont); // Match font
+    	showPlayback.setBorder(new EmptyBorder(5, 10, 5, 10)); // Add padding
+    
+    	showPlayback.addActionListener(e -> {
+            boolean isSelected = showPlayback.isSelected();
+            parent.enableInfo(isSelected);
+            Recorder.settings.putBoolean("ShowPlaybackProgress", isSelected);
+        });
+    	
+    	boolean isSelected = showPlayback.isSelected();
+        parent.enableInfo(isSelected);
+    	
+    	return showPlayback;
+    }
+    
     private JPanel createStyledSlider(Font menuFont, String title, int min, int max, int initialValue) {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel.setBackground(new Color(0, 0, 0, 255)); // Match background color
@@ -144,6 +168,20 @@ public class Options {
         panel.add(valueLabel);
 
         return panel;
+    }
+    
+    private JMenuItem setMonitorItem(Font menuFont) {
+    	JMenuItem setHotkey = new JMenuItem("Set current Monitor");
+        setHotkey.setBackground(new Color(0, 0, 0, 255)); // Match background color
+        setHotkey.setForeground(Color.WHITE); // Match text color
+        setHotkey.setFont(menuFont); // Match font
+        setHotkey.setBorder(new EmptyBorder(5, 10, 5, 10)); // Add padding
+
+        setHotkey.addActionListener(e -> {
+        	InputSimulator.resetGraphicDevice();
+        });
+
+        return setHotkey;
     }
 
     private JMenuItem createStickToTopItem(Font menuFont) {

@@ -103,7 +103,8 @@ public class Recorder implements EventListener {
 
     private void run() {
         previousTime = System.nanoTime();
-
+        String recordedTime = String.format("%.3f", loggedRecording.get(loggedRecording.size() - 1).getTimeStamp());
+        
         // Main input processing logic for playback
         scheduledFuture = executor.scheduleAtFixedRate(() -> {
             double currentTime = System.nanoTime();
@@ -111,6 +112,10 @@ public class Recorder implements EventListener {
             runTime += deltaTime;
 
             update(deltaTime);
+            
+            if (this.gui.isInfoVisible()) {
+            	this.gui.setInfoLabelText(String.format("%.3f", runTime) + "/" + recordedTime);
+            }
 
             previousTime = currentTime;
         }, TARGET_DELAY, TARGET_DELAY, TimeUnit.MILLISECONDS);
@@ -207,6 +212,12 @@ public class Recorder implements EventListener {
                         scheduledFuture.cancel(true);
                     }
                     currentState = State.IDLE;
+                    
+                    if (this.gui.isInfoVisible()) {
+                    	String recordedTime = String.format("%.3f", loggedRecording.get(loggedRecording.size() - 1).getTimeStamp());
+                    	this.gui.setInfoLabelText("0/" + recordedTime);
+                    }
+                    
                     System.out.println("Playback stopped");
                 } else if (type == 3 && enabled) { // Pause playback
                     if (scheduledFuture != null && !scheduledFuture.isCancelled()) {

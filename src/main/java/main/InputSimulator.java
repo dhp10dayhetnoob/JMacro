@@ -55,12 +55,6 @@ public class InputSimulator {
 		}
 		
 		if (type == 3) {
-			GraphicsDevice device = MouseInfo.getPointerInfo().getDevice();
-			if (currentDevice != device) {
-				currentDevice = device;
-				resetGraphicDevice();
-			}
-			
 			ROBOT.mouseMove((int) (input.getMouseX() * widthMultiplier), (int) (input.getMouseY() * heightMultiplier));
 		} else if (type == 2) {
 			if (input.getKeyOrButton() == -1) {
