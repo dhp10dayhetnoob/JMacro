@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.AWTException;
 import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.MouseInfo;
@@ -16,33 +17,20 @@ public class InputSimulator {
 	private static int currentHeight;
 	private static int recordedWidth;
 	private static int recordedHeight;
-	private static GraphicsDevice currentDevice = MouseInfo.getPointerInfo().getDevice();;
 	
 	private static double widthMultiplier = 1;
 	private static double heightMultiplier = 1;
 	
 	//not very pretty i know
 	static {
-	    resetGraphicDevice();
-	}
-	
-	public static void resetGraphicDevice() {
 		try {
-			currentDevice = MouseInfo.getPointerInfo().getDevice();
-	        ROBOT = new Robot(currentDevice);
-	        ROBOT.setAutoWaitForIdle(true);
-	    } catch (final Exception ex) {
-	        throw new RuntimeException("Failed to create Robot instance in static block.", ex);
-	    }
-	}
-	
-	public static void voidGraphicsDevice() {
-		try {
-	        ROBOT = new Robot();
-	        ROBOT.setAutoWaitForIdle(true);
-	    } catch (final Exception ex) {
-	        throw new RuntimeException("Failed to create Robot instance in static block.", ex);
-	    }
+			ROBOT = new Robot();
+		} catch (AWTException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+        ROBOT.setAutoWaitForIdle(true);
 	}
 	
 	public static void setResolution(String title, int width, int height) {
