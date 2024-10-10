@@ -94,8 +94,18 @@ public class MacroEditor {
         String[] parsed = rowInfo(index, macro);
         String inputTypeText = parsed[0];
         String detailsText = parsed[1];
+        
+        tableModel.insertRow(index, new Object[]{macro.getTimeStamp(), inputTypeText, detailsText});
+    }
 
-        tableModel.addRow(new Object[]{macro.getTimeStamp(), inputTypeText, detailsText});
+    private void updateTableRow(int index, InputObject macro) {
+        String[] parsed = rowInfo(index, macro);
+        String inputTypeText = parsed[0];
+        String detailsText = parsed[1];
+        
+        tableModel.setValueAt(macro.getTimeStamp(), index, 0);  // Update timestamp
+        tableModel.setValueAt(inputTypeText, index, 1);         // Update input type
+        tableModel.setValueAt(detailsText, index, 2);           // Update details
     }
 
     // Input type selection and form handling
@@ -272,17 +282,42 @@ public class MacroEditor {
 
     private void updateMacroList(int index, InputObject newMacro) {
         if (index == -1) {
+            // Adding a new macro
             macroList.add(newMacro);
-            addMacroToTable(macroList.size() - 1, newMacro);
-        } else {
-            macroList.set(index, newMacro);
-            refreshTable();
-        }
-    }
 
-    private void refreshTable() {
-        tableModel.setRowCount(0);
-        populateTable();
+            // Sort and maintain the list order
+            macroList.sort(Comparator.comparing(InputObject::getTimeStamp));
+
+            // Find the new index of the added macro
+            int newIndex = macroList.indexOf(newMacro);
+            
+            // Insert the new macro in the correct position in the table
+            addMacroToTable(newIndex, newMacro);
+        } else {
+            // Modifying an existing macro
+            InputObject existingMacro = macroList.get(index);
+            
+            // Update the existing macro in the list
+            macroList.set(index, newMacro);
+
+            // If the timestamp hasn't changed, update the table row directly
+            if (existingMacro.getTimeStamp() == newMacro.getTimeStamp()) {
+                updateTableRow(index, newMacro);
+            } else {
+                // Sort and find the new index for the modified macro
+                macroList.sort(Comparator.comparing(InputObject::getTimeStamp));
+                int newIndex = macroList.indexOf(newMacro);
+                
+                // If the index has changed, move the row in the table
+                if (newIndex != index) {
+                    tableModel.removeRow(index);   // Remove the old row
+                    addMacroToTable(newIndex, newMacro); // Insert it at the new position
+                } else {
+                    // If the index didn't change, just update the table row
+                    updateTableRow(newIndex, newMacro);
+                }
+            }
+        }
     }
 
     private String[] rowInfo(int index, InputObject macro) {
