@@ -70,6 +70,11 @@ public class Options {
         optionsMenu.add(createStyledSlider(menuFont, "<html>Mouse Movement<br>Capture Frequency<html>", 10, 45, defaultSliderValue));
         optionsMenu.add(new JSeparator());
         
+        int defaultSliderValuePlayback = Recorder.settings.getInt("PLAYBACK_SPEED", 1);
+        parent.parent.setPlaybackSpeed(defaultSliderValuePlayback);
+        optionsMenu.add(createPlaybackSpeedSlider(menuFont, "Playback Speed", 1, 10, defaultSliderValuePlayback));
+        optionsMenu.add(new JSeparator());
+        
         // Add monitor size and resolution input field
         optionsMenu.add(createSizeAndResolutionField(menuFont, "Recorded"));
         optionsMenu.add(new JSeparator());
@@ -158,6 +163,47 @@ public class Options {
             // Optionally, call any method to handle the value change
             Mouse.setMouseThrottle(1d/(double) slider.getValue());
             Recorder.settings.putInt("MOUSE_SLIDER", slider.getValue());
+        });
+
+        // Add the label, slider, and value label to the panel
+        panel.add(label);
+        panel.add(slider);
+        panel.add(valueLabel);
+
+        return panel;
+    }
+    
+    private JPanel createPlaybackSpeedSlider(Font menuFont, String title, int min, int max, int initialValue) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel.setBackground(new Color(0, 0, 0, 255)); // Match background color
+        
+        JLabel label = new JLabel(title + ": ");
+        label.setForeground(Color.WHITE);
+        label.setFont(menuFont);
+        
+        // Create the slider
+        JSlider slider = new JSlider(JSlider.HORIZONTAL, min, max, initialValue);
+        slider.setBackground(new Color(0, 0, 0, 255)); // Match background color
+        slider.setForeground(Color.WHITE); // Match text color
+        slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+        slider.setMajorTickSpacing(1);
+        slider.setFont(menuFont); // Match font
+
+        // Optional: Add a border to the slider
+        slider.setBorder(new EmptyBorder(5, 10, 5, 10));
+
+        // Create a label to display the current value of the slider
+        JLabel valueLabel = new JLabel(String.valueOf(initialValue) + "x");
+        valueLabel.setForeground(Color.WHITE);
+        valueLabel.setFont(menuFont);
+
+        // Add a change listener to update the value label when the slider is adjusted
+        slider.addChangeListener(e -> {
+            valueLabel.setText(String.valueOf(slider.getValue()) + "x");
+            // Optionally, call any method to handle the value change
+            parent.parent.setPlaybackSpeed(slider.getValue());
+            Recorder.settings.putInt("PLAYBACK_SPEED", slider.getValue());
         });
 
         // Add the label, slider, and value label to the panel

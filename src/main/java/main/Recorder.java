@@ -40,6 +40,7 @@ public class Recorder implements EventListener {
     private long previousTime;
     private double runTime;
     private long pauseRecordingTime;
+    private int playbackSpeed = 1;
 
     private ArrayList<InputObject> loggedRecording;
     private int iterator;
@@ -61,11 +62,15 @@ public class Recorder implements EventListener {
     }
 
     public void setRecording(ArrayList<InputObject> recording) {
-        this.loggedRecording = recording;
+        loggedRecording = recording;
     }
 
     public void setContinuousPlayback(boolean enabled) {
         continuousPlayback = enabled;
+    }
+    
+    public void setPlaybackSpeed(int speed) {
+    	playbackSpeed = speed;
     }
 
     public Recorder() {
@@ -110,7 +115,7 @@ public class Recorder implements EventListener {
         // Main input processing logic for playback
         scheduledFuture = executor.scheduleAtFixedRate(() -> {
             long currentTime = System.nanoTime();
-            double deltaTime = (currentTime - previousTime) / 1_000_000_000d;
+            double deltaTime = ((currentTime - previousTime) / 1_000_000_000d) * playbackSpeed;
             runTime += deltaTime;
 
             workerPool.submit(() -> {
