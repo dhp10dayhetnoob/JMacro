@@ -13,7 +13,7 @@ public class Mouse implements NativeMouseListener, NativeMouseMotionListener, Ev
 	private static double MOUSE_MOVE_THROTTLE = .033; //max 30 mouse moves a second
 	private static final double MOUSE_MOVE_TIMESHIFT = 0.001;
 	private double nextMouseMove;
-	private double recordingStartTime; //use this instead of using RecordingList !!!
+	private long recordingStartTime; //use this instead of using RecordingList !!!
 	
 	private ArrayList<InputObject> loggedRecording;
 	private boolean enabled;
@@ -36,7 +36,7 @@ public class Mouse implements NativeMouseListener, NativeMouseMotionListener, Ev
 		MOUSE_MOVE_THROTTLE = throttle;
 	}
 	
-	public void addToStartTime(double time) {
+	public void addToStartTime(long time) {
 		this.recordingStartTime = this.recordingStartTime + time;
 	}
 	

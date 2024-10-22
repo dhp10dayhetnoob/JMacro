@@ -11,7 +11,7 @@ import main.Recorder;
 public class Keyboard implements NativeKeyListener, EventListener {
 	private ArrayList<InputObject> loggedRecording;
 	private boolean enabled;
-	private double recordingStartTime; //use this instead of using RecordingList !!!
+	private long recordingStartTime; //use this instead of using RecordingList !!!
 	
 	public Keyboard(ArrayList<InputObject> loggedRecording) {
 		this.loggedRecording = loggedRecording;
@@ -26,7 +26,7 @@ public class Keyboard implements NativeKeyListener, EventListener {
 		this.loggedRecording = loggedRecording;
 	}
 	
-	public void addToStartTime(double time) {
+	public void addToStartTime(long time) {
 		this.recordingStartTime = this.recordingStartTime + time;
 	}
 		 

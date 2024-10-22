@@ -6,6 +6,7 @@ import input.Keyboard;
 import input.Mouse;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -26,7 +27,8 @@ public class Recorder implements EventListener {
     }
 
     private static final double EPSILON = 0.005;
-    private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
+    private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
+    private static final ExecutorService workerPool = Executors.newFixedThreadPool(2);
     private static final int TARGET_DELAY = 16; // target delay in milliseconds
 
     public static int RECORD_HOTKEY = Integer.parseInt(settings.get("RECORD_HOTKEY", Integer.toString(NativeKeyEvent.VC_F1)));
@@ -35,9 +37,9 @@ public class Recorder implements EventListener {
 
     private State currentState = State.IDLE; // Initial state
     private double recordingStartTime;
-    private double previousTime;
+    private long previousTime;
     private double runTime;
-    private double pauseRecordingTime;
+    private long pauseRecordingTime;
 
     private ArrayList<InputObject> loggedRecording;
     private int iterator;
@@ -107,11 +109,13 @@ public class Recorder implements EventListener {
         
         // Main input processing logic for playback
         scheduledFuture = executor.scheduleAtFixedRate(() -> {
-            double currentTime = System.nanoTime();
+            long currentTime = System.nanoTime();
             double deltaTime = (currentTime - previousTime) / 1_000_000_000d;
             runTime += deltaTime;
 
-            update(deltaTime);
+            workerPool.submit(() -> {
+            	update(deltaTime);
+            });
             
             if (this.gui.isInfoVisible()) {
             	this.gui.setInfoLabelText(String.format("%.3f", runTime) + "/" + recordedTime);
@@ -237,11 +241,12 @@ public class Recorder implements EventListener {
 	                    run(); // Restart the playback logic
 	                    gui.setPlaying(true);
             		} else if (gui.isRecording()) {
-            			double time = (System.nanoTime() - pauseRecordingTime);
+            			long time = (System.nanoTime() - pauseRecordingTime);
             			this.mouseListener.setEnabled(true);
             			this.keyboardListener.setEnabled(true);
             			this.mouseListener.addToStartTime(time);
             			this.keyboardListener.addToStartTime(time);
+            			recordingStartTime += time;
             			currentState = State.RECORDING;
             		}
                 } else if (type == 2 && !enabled) { // Stop playback
